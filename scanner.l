@@ -4,7 +4,7 @@
     Leonardo Marques Rodrigues - 00213751
     */
 
-    #include "tokens.h"
+    #include "parser.tab.h"
     int line_number = 1;
     int get_line_number(void);
 %}
@@ -43,7 +43,7 @@
 "default"    { return TK_PR_DEFAULT   ;}
 
  /* 3.2 - Caracteres Especiais */;
-[\,\;\:\(\)\[\]\{\}\+\-\|\*\<\>\=\!\&\%\#\^\.\$\/]  { return yytext[0] ;}
+[\,\;\:\(\)\[\]\{\}\+\-\|\*\<\>\=\!\&\%\#\^\.\$\/\?]  { return yytext[0] ;}
 
  /* 3.3 - Operadores Compostos */;
 "<="  { return TK_OC_LE  ;}
@@ -58,8 +58,8 @@
  /* 3.5 - Literais */;
 "false"                                { return TK_LIT_FALSE  ;}
 "true"                                 { return TK_LIT_TRUE   ;}
-[-+]?[0-9]+                            { return TK_LIT_INT    ;}
-[-+]?[0-9]+\.[0-9]+([eE][-+]?[0-9]+)?  { return TK_LIT_FLOAT  ;}
+[0-9]+                            { return TK_LIT_INT    ;}
+[0-9]+\.[0-9]+([eE][0-9]+)?  { return TK_LIT_FLOAT  ;}
 \'([^\"\\\n]|\\.)\'                    { return TK_LIT_CHAR   ;}
 \"([^\"\\\n]|\\.)*\"                   { return TK_LIT_STRING ;}
 
