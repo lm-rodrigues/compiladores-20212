@@ -5,11 +5,13 @@
     */
 
     #include <stdio.h>
+
     int get_line_number(void);
 
     int yylex(void);
-    int yyerror (char const *s);
+    void yyerror (char const *s);
 %}
+%define parse.error verbose
 
 %token TK_PR_INT
 %token TK_PR_FLOAT
@@ -109,13 +111,10 @@ declaracaoFuncao: cabecalho blocoComandos;
 
 cabecalho: opcionalStatic tipo TK_IDENTIFICADOR '(' listaParametros ')';
 
-listaParametros: parametroEntrada parametroSeguinte
-    |
-    ;
-parametroEntrada: opcionalConst tipo TK_IDENTIFICADOR;
-parametroSeguinte: ',' listaParametros
-  |
-  ;
+listaParametros: opcionalConst tipo TK_IDENTIFICADOR listaParametros
+ | ',' opcionalConst tipo TK_IDENTIFICADOR listaParametros
+ |
+ ;
 
 blocoComandos: '{' comando '}' ;
 
@@ -165,7 +164,7 @@ atribuicao: TK_IDENTIFICADOR '=' expressao
 opEntrada: TK_PR_INPUT TK_IDENTIFICADOR;
 opSaida: TK_PR_OUTPUT identificadorOuLiteral;
 
-// 3.4 - subtitle 4 - Chamada de Função
+// 3.4 - subtitle 4 - Chamada de Função;
 chamadaFuncao: nomeFuncao '(' listaEntradas ')';
 
 nomeFuncao: TK_IDENTIFICADOR;
@@ -178,7 +177,7 @@ entradaSeguinte: ',' listaEntradas
   ;
 
 
-// 3.4 - subtitle 5 - Comandos de Shift
+// 3.4 - subtitle 5 - Comandos de Shift;
 comandoShift: TK_IDENTIFICADOR shifts numero;
 shifts: TK_OC_SR | TK_OC_SL;
 // Como garantir que vai ser positivo??
@@ -245,9 +244,6 @@ ternarios: expressao '?' expressao ':' expressao;
 
 %%
 
-int yyerror (char const *s) {
-    // TO DO: dizer qual o erro na linha
-    printf( "Erro: %s \n Linha %d \n", s, get_line_number() );
-
-    return 1;
+void yyerror (char const *s) {
+    printf( "Erro encontrado na linha %d: %s \n", get_line_number(), s );
 }
