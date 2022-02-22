@@ -80,7 +80,7 @@ dec: declaracaoVariavelGlobal
     | declaracaoFuncao
     ;
 
-// -- Definições que se repetem;
+// Definições que se repetem;
 identificadorOuLiteral: TK_IDENTIFICADOR
     | TK_LIT_TRUE
     | TK_LIT_FALSE
@@ -104,33 +104,10 @@ opcionalConst: TK_PR_CONST
     |
     ;
 
+numero: TK_LIT_INT;
 
-// 3.2 - Definição de Funções;
 
-declaracaoFuncao: opcionalStatic tipo TK_IDENTIFICADOR '(' listaParametros ')' blocoComandos;
-
-listaParametros: opcionalConst tipo TK_IDENTIFICADOR listaParametros
- | ',' opcionalConst tipo TK_IDENTIFICADOR listaParametros
- |
- ;
-
-blocoComandos: '{' comando '}' ;
-
-comando: comandoSimples ';' comando
-    |
-    ;
-comandoSimples: declaracaoVariavelLocal
-    | atribuicao
-    | fluxoControle
-    | opEntrada
-    | opSaida
-    | opRetorno
-    | blocoComandos
-    | chamadaFuncao
-    | comandoShift
-    ;
-
-// 3.1 - Declaração de Variavel Global;
+// Definição da seção 3.1;
 declaracaoVariavelGlobal: opcionalStatic tipo varGlobal opcionalListVarGlobal ';' ;
 
 opcionalListVarGlobal: ',' varGlobal
@@ -141,9 +118,36 @@ varGlobal: TK_IDENTIFICADOR
     | TK_IDENTIFICADOR '[' numero ']'
     ;
 
-// 3.4 - subtitle 1 - Declaração de Variavel Local
-declaracaoVariavelLocal: opcionalStatic opcionalConst tipo variavelLocal;
 
+// Definição da seção 3.2;
+declaracaoFuncao: opcionalStatic tipo TK_IDENTIFICADOR '(' listaParametros ')' blocoComandos;
+
+listaParametros: opcionalConst tipo TK_IDENTIFICADOR listaParametros
+    | ',' opcionalConst tipo TK_IDENTIFICADOR listaParametros
+    |
+    ;
+
+
+// Definição da seção 3.3;
+blocoComandos: '{' comando '}' ;
+
+comando: comandoSimples ';' comando
+    |
+    ;
+comandoSimples: declaracaoVariavelLocal
+    | atribuicao
+    | fluxoControle
+    | operacoesEntrada
+    | operacoesSaida
+    | operacoesRetorno
+    | blocoComandos
+    | chamadaFuncao
+    | comandoShift
+    ;
+
+
+// Definições da seção 3.4;
+declaracaoVariavelLocal: opcionalStatic opcionalConst tipo variavelLocal;
 variavelLocal: TK_IDENTIFICADOR opcionalInit listaVar;
 
 listaVar: ',' variavelLocal
@@ -153,51 +157,46 @@ opcionalInit: TK_OC_LE identificadorOuLiteral
     |
     ;
 
-// 3.4 - subtitle 2 - Comando de Atribuição;
+
 atribuicao: TK_IDENTIFICADOR '=' expressao
     | TK_IDENTIFICADOR '[' expressao ']' '=' expressao
     ;
 
-// 3.4 - subtitle 3 - Comando de Entrada e Saida;
-opEntrada: TK_PR_INPUT TK_IDENTIFICADOR;
-opSaida: TK_PR_OUTPUT identificadorOuLiteral;
 
-// 3.4 - subtitle 4 - Chamada de Função;
-chamadaFuncao: nomeFuncao '(' listaEntradas ')';
+operacoesEntrada: TK_PR_INPUT TK_IDENTIFICADOR;
+operacoesSaida: TK_PR_OUTPUT identificadorOuLiteral;
 
-nomeFuncao: TK_IDENTIFICADOR;
-listaEntradas: entrada entradaSeguinte
+
+chamadaFuncao: TK_IDENTIFICADOR '(' listaEntradas ')';
+listaEntradas: TK_IDENTIFICADOR entradaSeguinte
     |
     ;
-entrada: TK_IDENTIFICADOR;
 entradaSeguinte: ',' listaEntradas
-  |
-  ;
+    |
+    ;
 
 
-// 3.4 - subtitle 5 - Comandos de Shift;
 comandoShift: TK_IDENTIFICADOR shifts numero;
-shifts: TK_OC_SR | TK_OC_SL;
-// Como garantir que vai ser positivo??
-numero: TK_LIT_INT;
+shifts: TK_OC_SR
+    | TK_OC_SL
+    ;
 
-// 3.4 - subtitle 6
-opRetorno: TK_PR_RETURN expressao
+
+operacoesRetorno: TK_PR_RETURN expressao
     | TK_PR_CONTINUE
     | TK_PR_BREAK
     ;
 
-// 3.4 - subtitle 7
+
 fluxoControle: TK_PR_IF '(' expressao ')' blocoComandos opcionalElse
     | TK_PR_FOR '(' atribuicao ':' expressao ':' atribuicao ')' blocoComandos
     | TK_PR_WHILE '(' expressao ')' TK_PR_DO blocoComandos
     ;
-
 opcionalElse: TK_PR_ELSE blocoComandos
     |
     ;
 
-// 3.5 - Expr. Aritmeticas, Logicas;
+
 expressao: aritmeticas
     | operacoes
     | '(' expressao ')'
@@ -212,7 +211,10 @@ aritmeticas: TK_IDENTIFICADOR
     | chamadaFuncao
     ;
 
-operacoes: unarios | binarios | ternarios;
+operacoes: unarios
+    | binarios
+    | ternarios
+    ;
 unarios: '+' expressao
     |'-' expressao
     |'!' expressao
