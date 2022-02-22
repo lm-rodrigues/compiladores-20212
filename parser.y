@@ -9,8 +9,6 @@
 
     int yylex(void);
     int yyerror (char const *s);
-    // no dado pelo professor é void -_o_-
-    // troquei pra int pra não usar o exit
 %}
 
 %token TK_PR_INT
@@ -251,8 +249,5 @@ int yyerror (char const *s) {
     // TO DO: dizer qual o erro na linha
     printf( "Erro: %s \n Linha %d \n", s, get_line_number() );
 
-    // TO DO: Entender se precisa desse exit e como usar
-    // exit( 500 );
-    // Deveria ser um return 0 ? return 1?
     return 1;
 }
