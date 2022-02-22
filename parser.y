@@ -107,9 +107,7 @@ opcionalConst: TK_PR_CONST
 
 // 3.2 - Definição de Funções;
 
-declaracaoFuncao: cabecalho blocoComandos;
-
-cabecalho: opcionalStatic tipo TK_IDENTIFICADOR '(' listaParametros ')';
+declaracaoFuncao: opcionalStatic tipo TK_IDENTIFICADOR '(' listaParametros ')' blocoComandos;
 
 listaParametros: opcionalConst tipo TK_IDENTIFICADOR listaParametros
  | ',' opcionalConst tipo TK_IDENTIFICADOR listaParametros
