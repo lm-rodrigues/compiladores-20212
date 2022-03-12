@@ -70,18 +70,22 @@
 %%
 
 // 3 - A Linguagem ;
-programa: decList;
+programa:
+      decList;
 
-decList: dec decList
+decList:
+      dec decList
     |
     ;
 
-dec: declaracaoVariavelGlobal
+dec:
+      declaracaoVariavelGlobal
     | declaracaoFuncao
     ;
 
 // Definições que se repetem;
-identificadorOuLiteral: TK_IDENTIFICADOR
+identificadorOuLiteral:
+      TK_IDENTIFICADOR
     | TK_LIT_TRUE
     | TK_LIT_FALSE
     | TK_LIT_CHAR
@@ -90,51 +94,61 @@ identificadorOuLiteral: TK_IDENTIFICADOR
     | TK_LIT_STRING
     ;
 
-tipo: TK_PR_INT
+tipo:
+      TK_PR_INT
     | TK_PR_FLOAT
     | TK_PR_CHAR
     | TK_PR_BOOL
     | TK_PR_STRING
     ;
 
-opcionalStatic: TK_PR_STATIC
+opcionalStatic:
+      TK_PR_STATIC
     |
     ;
-opcionalConst: TK_PR_CONST
+opcionalConst:
+      TK_PR_CONST
     |
     ;
 
-numero: TK_LIT_INT;
+numero:
+      TK_LIT_INT;
 
 
 // Definição da seção 3.1;
-declaracaoVariavelGlobal: opcionalStatic tipo varGlobal opcionalListVarGlobal ';' ;
-
-opcionalListVarGlobal: ',' varGlobal
-    |
+declaracaoVariavelGlobal:
+      opcionalStatic tipo TK_IDENTIFICADOR opcionalListVarGlobal ';'
+    | opcionalStatic tipo TK_IDENTIFICADOR '[' numero ']' opcionalListVarGlobal ';'
     ;
 
-varGlobal: TK_IDENTIFICADOR
-    | TK_IDENTIFICADOR '[' numero ']'
+opcionalListVarGlobal:
+      ',' TK_IDENTIFICADOR opcionalListVarGlobal
+    | ',' TK_IDENTIFICADOR '[' numero ']' opcionalListVarGlobal
+    |
     ;
 
 
 // Definição da seção 3.2;
-declaracaoFuncao: opcionalStatic tipo TK_IDENTIFICADOR '(' listaParametros ')' blocoComandos;
+declaracaoFuncao:
+      opcionalStatic tipo TK_IDENTIFICADOR '(' listaParametros ')' blocoComandos;
 
-listaParametros: opcionalConst tipo TK_IDENTIFICADOR listaParametros
+listaParametros:
+      opcionalConst tipo TK_IDENTIFICADOR listaParametros
     | ',' opcionalConst tipo TK_IDENTIFICADOR listaParametros
     |
     ;
 
 
 // Definição da seção 3.3;
-blocoComandos: '{' comando '}' ;
+blocoComandos:
+      '{' comando '}' ;
 
-comando: comandoSimples ';' comando
+comando:
+      comandoSimples ';' comando
     |
     ;
-comandoSimples: declaracaoVariavelLocal
+comandoSimples:
+      declaracaoVariavelLocal
     | atribuicao
     | fluxoControle
     | operacoesEntrada
@@ -147,75 +161,92 @@ comandoSimples: declaracaoVariavelLocal
 
 
 // Definições da seção 3.4;
-declaracaoVariavelLocal: opcionalStatic opcionalConst tipo variavelLocal;
-variavelLocal: TK_IDENTIFICADOR opcionalInit listaVar;
+declaracaoVariavelLocal:
+      opcionalStatic opcionalConst tipo variavelLocal;
 
-listaVar: ',' variavelLocal
+variavelLocal:
+      TK_IDENTIFICADOR opcionalInit listaVar;
+
+listaVar:
+      ',' variavelLocal
     |
     ;
-opcionalInit: TK_OC_LE identificadorOuLiteral
+opcionalInit:
+      TK_OC_LE identificadorOuLiteral
     |
     ;
 
 
-atribuicao: TK_IDENTIFICADOR '=' expressao
+atribuicao:
+      TK_IDENTIFICADOR '=' expressao
     | TK_IDENTIFICADOR '[' expressao ']' '=' expressao
     ;
 
 
-operacoesEntrada: TK_PR_INPUT TK_IDENTIFICADOR;
-operacoesSaida: TK_PR_OUTPUT identificadorOuLiteral;
+operacoesEntrada:
+      TK_PR_INPUT TK_IDENTIFICADOR;
+
+operacoesSaida:
+      TK_PR_OUTPUT identificadorOuLiteral;
 
 
-chamadaFuncao: TK_IDENTIFICADOR '(' listaEntradas ')';
-listaEntradas: TK_IDENTIFICADOR entradaSeguinte
+chamadaFuncao:
+      TK_IDENTIFICADOR '(' listaEntradas ')';
+listaEntradas:
+      TK_IDENTIFICADOR entradaSeguinte
     |
     ;
-entradaSeguinte: ',' listaEntradas
+
+entradaSeguinte:
+      ',' listaEntradas
     |
     ;
 
 
-comandoShift: TK_IDENTIFICADOR shifts numero;
-shifts: TK_OC_SR
-    | TK_OC_SL
+comandoShift:
+      TK_IDENTIFICADOR TK_OC_SR numero
+    | TK_IDENTIFICADOR TK_OC_SL numero
     ;
 
 
-operacoesRetorno: TK_PR_RETURN expressao
+
+operacoesRetorno:
+      TK_PR_RETURN expressao
     | TK_PR_CONTINUE
     | TK_PR_BREAK
     ;
 
 
-fluxoControle: TK_PR_IF '(' expressao ')' blocoComandos opcionalElse
+fluxoControle:
+      TK_PR_IF '(' expressao ')' blocoComandos
+    | TK_PR_IF '(' expressao ')' blocoComandos TK_PR_ELSE blocoComandos
     | TK_PR_FOR '(' atribuicao ':' expressao ':' atribuicao ')' blocoComandos
     | TK_PR_WHILE '(' expressao ')' TK_PR_DO blocoComandos
     ;
-opcionalElse: TK_PR_ELSE blocoComandos
-    |
-    ;
 
 
-expressao: aritmeticas
+expressao:
+      aritmeticas
     | operacoes
     | '(' expressao ')'
-    | TK_LIT_TRUE
-    | TK_LIT_FALSE
     ;
 
-aritmeticas: TK_IDENTIFICADOR
+aritmeticas:
+      TK_IDENTIFICADOR
     | TK_IDENTIFICADOR '[' expressao ']'
     | TK_LIT_INT
     | TK_LIT_FLOAT
     | chamadaFuncao
     ;
 
-operacoes: unarios
+operacoes:
+      unarios
     | binarios
     | ternarios
     ;
-unarios: '+' expressao
+
+unarios:
+     '+' expressao
     |'-' expressao
     |'!' expressao
     |'&' expressao
@@ -223,7 +254,9 @@ unarios: '+' expressao
     |'?' expressao
     |'#' expressao
     ;
-binarios: expressao '+' expressao
+
+binarios:
+      expressao '+' expressao
     | expressao '-' expressao
     | expressao '*' expressao
     | expressao '/' expressao
@@ -240,7 +273,9 @@ binarios: expressao '+' expressao
     | expressao TK_OC_NE expressao
     | expressao TK_OC_LE expressao
     ;
-ternarios: expressao '?' expressao ':' expressao;
+
+ternarios:
+      expressao '?' expressao ':' expressao;
 
 %%
 
