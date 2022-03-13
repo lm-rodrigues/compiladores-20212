@@ -5,11 +5,12 @@
     */
 
     #include "parser.tab.h"
+    #include "lexeme.h"
     int line_number = 1;
     int get_line_number(void);
 %}
 
- // Lex states definitions
+// Lex states definitions
 %x MULTILINE_COMMENT
 
 %%
@@ -43,28 +44,30 @@
 "default"    { return TK_PR_DEFAULT   ;}
 
  /* 3.2 - Caracteres Especiais */;
-[\,\;\:\(\)\[\]\{\}\+\-\|\*\<\>\=\!\&\%\#\^\.\$\/\?]  { return yytext[0] ;}
+[\,\;\:\(\)\[\]\{\}\.] { return yytext[0] ;}
+
+[\+\-\|\*\<\>\=\!\&\%\#\^\$\/\?] { yylval.lexeme = lexemes_from_tokens(line_number, yytext, char_sequence, special_char); return yytext[0] ;}
 
  /* 3.3 - Operadores Compostos */;
-"<="  { return TK_OC_LE  ;}
-">="  { return TK_OC_GE  ;}
-"=="  { return TK_OC_EQ  ;}
-"!="  { return TK_OC_NE  ;}
-"&&"  { return TK_OC_AND ;}
-"||"  { return TK_OC_OR  ;}
-">>"  { return TK_OC_SL  ;}
-"<<"  { return TK_OC_SR  ;}
+"<="  { yylval.lexeme = lexemes_from_tokens(line_number, yytext, char_sequence, composed_operator); return TK_OC_LE  ;}
+">="  { yylval.lexeme = lexemes_from_tokens(line_number, yytext, char_sequence, composed_operator); return TK_OC_GE  ;}
+"=="  { yylval.lexeme = lexemes_from_tokens(line_number, yytext, char_sequence, composed_operator); return TK_OC_EQ  ;}
+"!="  { yylval.lexeme = lexemes_from_tokens(line_number, yytext, char_sequence, composed_operator); return TK_OC_NE  ;}
+"&&"  { yylval.lexeme = lexemes_from_tokens(line_number, yytext, char_sequence, composed_operator); return TK_OC_AND ;}
+"||"  { yylval.lexeme = lexemes_from_tokens(line_number, yytext, char_sequence, composed_operator); return TK_OC_OR  ;}
+">>"  { yylval.lexeme = lexemes_from_tokens(line_number, yytext, char_sequence, composed_operator); return TK_OC_SL  ;}
+"<<"  { yylval.lexeme = lexemes_from_tokens(line_number, yytext, char_sequence, composed_operator); return TK_OC_SR  ;}
 
  /* 3.5 - Literais */;
-"false"                                { return TK_LIT_FALSE  ;}
-"true"                                 { return TK_LIT_TRUE   ;}
-[0-9]+                            { return TK_LIT_INT    ;}
-[0-9]+\.[0-9]+([eE][0-9]+)?  { return TK_LIT_FLOAT  ;}
-\'([^\"\\\n]|\\.)\'                    { return TK_LIT_CHAR   ;}
-\"([^\"\\\n]|\\.)*\"                   { return TK_LIT_STRING ;}
+"false"                      { yylval.lexeme = lexemes_from_tokens(line_number, yytext, boolean, literal);       return TK_LIT_FALSE  ;}
+"true"                       { yylval.lexeme = lexemes_from_tokens(line_number, yytext, boolean, literal);       return TK_LIT_TRUE   ;}
+[0-9]+                       { yylval.lexeme = lexemes_from_tokens(line_number, yytext, integer, literal);       return TK_LIT_INT    ;}
+[0-9]+\.[0-9]+([eE][0-9]+)?  { yylval.lexeme = lexemes_from_tokens(line_number, yytext, floating, literal);      return TK_LIT_FLOAT  ;}
+\'([^\"\\\n]|\\.)\'          { yylval.lexeme = lexemes_from_tokens(line_number, yytext, character, literal);     return TK_LIT_CHAR   ;}
+\"([^\"\\\n]|\\.)*\"         { yylval.lexeme = lexemes_from_tokens(line_number, yytext, char_sequence, literal); return TK_LIT_STRING ;}
 
  /* 3.4 - Identificadores */;
-[A-Za-z_][A-Za-z_0-9]*  { return TK_IDENTIFICADOR ;}
+[A-Za-z_][A-Za-z_0-9]*  { yylval.lexeme = lexemes_from_tokens(line_number, yytext, char_sequence, identifier); return TK_IDENTIFICADOR ;}
 
  /* 2.2 - Contagem de linhas */;
 "\n"  { line_number++ ;}
