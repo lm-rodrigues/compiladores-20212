@@ -10,7 +10,10 @@ Leonardo Marques Rodrigues - 00213751
 struct AST_NODE *create_ast_node(NodeType type, Lexeme *lexeme, struct AST_NODE *s0, struct AST_NODE *s1, struct AST_NODE *s2, struct AST_NODE *s3) {
     AST_NODE *new_node;
     new_node = malloc(sizeof(AST_NODE));
-    new_node->lexeme = malloc(sizeof(lexeme));
+    // new_node->lexeme = malloc(sizeof(lexeme));
+    if ( lexeme != NULL ) {
+        print_lexeme( *lexeme );
+    }
 
     new_node->node_type = type;
     new_node->lexeme = lexeme;
@@ -22,35 +25,22 @@ struct AST_NODE *create_ast_node(NodeType type, Lexeme *lexeme, struct AST_NODE 
     return new_node;
 }
 
-
-
-void exporta(void *tree) {
-    AST_NODE *root = (AST_NODE *) tree;
-
-    tree_to_csv(root);
-    node_to_label(root);
-}
-
 void node_to_label(AST_NODE *tree) {
-    if (tree == NULL) {
-        return;
-    }
-
-    int sonIndex = 0;
+    if (tree == NULL) { return ;}
+    int son_index = 0;
 
     if (tree->lexeme != NULL) {
         printf("%p [label=\"", tree);
         if (tree->node_type != no_type) {
             print_node_type(tree->node_type);
+        } else {
+            print_literal_value(tree->lexeme->literal_token_value_type);
         }
-        // if (tree->lexeme->literal_token_value_type != NULL) {
-        //     print_literal_value(tree->lexeme->literal_token_value_type);
-        // }
         printf("\"]\n");
   }
 
-  for(sonIndex = 0; sonIndex < MAX_SONS; sonIndex++) {
-    node_to_label(tree->son[sonIndex]);
+  for(son_index = 0; son_index < MAX_SONS; son_index++) {
+    node_to_label(tree->son[son_index]);
   }
 }
 
@@ -68,9 +58,16 @@ void tree_to_csv(AST_NODE *tree) {
   }
 }
 
+
+void exporta(void *tree) {
+    AST_NODE *root = (AST_NODE *) tree;
+
+    node_to_label(root);
+    // tree_to_csv(root);
+}
+
 void libera(void *tree) {
-  AST_NODE *root = (AST_NODE *) tree;
-  free_tree(root);
+  free_tree((AST_NODE *) tree);
 
 }
 
@@ -80,9 +77,9 @@ void free_tree(AST_NODE *tree) {
         free_tree(tree->son[son_index]);
     }
 
-    // if (tree->label != NULL) {
-    //     free_lexeme(tree->label);
-    // }
+    if (tree->lexeme != NULL) {
+        free_lexeme(tree->lexeme);
+    }
 
     free(tree);
   }
@@ -90,46 +87,47 @@ void free_tree(AST_NODE *tree) {
 }
 
 
-void print_node_type(NodeType nodeType) {
+void print_node_type(NodeType node_type) {
 
-    switch (nodeType)
-    {
-        case function_def:
-            break;
+    switch (node_type){
+
+        // case function_def:
+        //     break;
         case cmd_while:
-            printf("%s", "while");
+            printf("while");
             break;
         case cmd_for:
-            printf("%s","for");
+            printf("for");
             break;
         case cmd_if:
-            printf("%s","if");
+            printf("if");
             break;
         case cmd_return:
-            printf("%s","return");
+            printf("return");
             break;
         case cmd_break:
-            printf("%s","break");
+            printf("break");
             break;
         case cmd_continue:
-            printf("%s","continue");
+            printf("continue");
             break;
         case cmd_output:
-            printf("%s","output");
+            printf( "output" );
             break;
         case cmd_input:
-            printf("%s","input");
+            printf( "input" );
             break;
         case opr_ternary:
-            printf("%s","?:");
+            printf( "?:" );
             break;
         case vec_index:
-            printf("%s","[]");
+            printf( "[]" );
             break;
         case var_attribution:
+            printf( "=" );
             break;
-        case var_initializer:
-            break;
+        // case var_initializer:
+        //     break;
         case function_call:
             printf("call ");
             break;

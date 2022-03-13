@@ -181,8 +181,8 @@ opcionalListVarGlobal:
 
 // Definição da seção 3.2;
 declaracaoFuncao:
-        opcionalStatic tipo TK_IDENTIFICADOR '(' parametros ')' blocoComandos { $$ = create_ast_node( function_def, NULL, $3, $5, $7, NULL)   ;}
-      | opcionalStatic tipo TK_IDENTIFICADOR '(' ')' blocoComandos            { $$ = create_ast_node( function_def, NULL, $3, $6, NULL, NULL) ;}
+        opcionalStatic tipo TK_IDENTIFICADOR '(' parametros ')' blocoComandos { $$ = create_ast_node( function_def, NULL, create_ast_node( no_type, $3, NULL, NULL, NULL, NULL), $5, $7, NULL)  ;}
+      | opcionalStatic tipo TK_IDENTIFICADOR '(' ')' blocoComandos            { $$ = create_ast_node( function_def, NULL, create_ast_node( no_type, $3, NULL, NULL, NULL, NULL), $6, NULL, NULL) ;}
       ;
 
 parametros:
@@ -220,16 +220,16 @@ comandoSimples:
 
 // Definições da seção 3.4;
 declaracaoVariavelLocal:
-      opcionalStatic opcionalConst tipo variavelLocal { $$ = $4 ;}
+      opcionalStatic opcionalConst tipo variavelLocal { $$ = NULL;}
       ;
 
 variavelLocal:
-      TK_IDENTIFICADOR opcionalInit listaVar { $$ = create_ast_node( no_type, $1, $2, $3, NULL, NULL ) ;}
+      TK_IDENTIFICADOR opcionalInit listaVar
       ;
 
 listaVar:
-      ',' variavelLocal { $$ = $2   ;}
-    |                   { $$ = NULL ;}
+      ',' variavelLocal
+    |
     ;
 opcionalInit:
       TK_OC_LE identificadorOuLiteral { $$ = $2   ;}
@@ -238,7 +238,7 @@ opcionalInit:
 
 
 atribuicao:
-      TK_IDENTIFICADOR '=' expressao                   { $$ = create_ast_node( var_attribution, $2, $1, $3, NULL, NULL) ;}
+      TK_IDENTIFICADOR '=' expressao                   { $$ = create_ast_node( var_attribution, $2, create_ast_node( no_type, $1, NULL, NULL, NULL, NULL ), $3, NULL, NULL) ;}
     | TK_IDENTIFICADOR '[' expressao ']' '=' expressao { $$ = create_ast_node( var_attribution, $5, $1, $3, $6, NULL)   ;}
     ;
 

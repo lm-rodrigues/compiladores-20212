@@ -41,20 +41,18 @@ typedef struct {
 
 typedef struct Lexeme
 {
-    int line_number; // Especificação 2.1 (a)
-    TokenCategory token_category; // Especificação 2.1 (b)
-    LiteralTokenValueType literal_token_value_type; // Especificação 2.1 (c)
+    int line_number;
 
-    // for non-literal tokens categories literalTokenValueType always assumes:
-    // LiteralTokenType: char_sequence
-    // LiteralTokenValue: *char_sequence
+    TokenCategory token_category;
+
+    LiteralTokenValueType literal_token_value_type;
 
 } Lexeme;
 
 void   print_lexeme(Lexeme lexical_value);
 void   print_literal_value(LiteralTokenValueType literal_token_value_type);
 Lexeme* lexemes_from_tokens(int line_number, char *value, LiteralTokenType type, TokenCategory token_category);
-char*  strip_quotation_marks(char *value) ;
+char*  strip_quotation_marks(char *value);
 void   free_lexeme(Lexeme *lexeme);
 
 #endif

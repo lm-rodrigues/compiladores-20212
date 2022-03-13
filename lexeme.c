@@ -10,33 +10,32 @@ Leonardo Marques Rodrigues - 00213751
 
 // Print lexeme information for debug purposes
 void print_lexeme(Lexeme lexeme) {
-
     printf("Line Number:         %d\n", lexeme.line_number);
     printf("Token Category:      %d\n", lexeme.token_category);
     printf("Literal Token Type:  %d\n", lexeme.literal_token_value_type.type);
     printf("Literal Token Value: ");
     print_literal_value(lexeme.literal_token_value_type);
+    printf( "\n\n-----------------------------------------------------------------\n\n" );
 }
 
 // Prints literals actual value
 void print_literal_value(LiteralTokenValueType literal_token_value_type) {
-
     LiteralTokenType literal_token_type = literal_token_value_type.type;
 
     if (literal_token_type == char_sequence) {
-        printf("%s\n", literal_token_value_type.value.char_sequence);
+        printf("%s", literal_token_value_type.value.char_sequence);
 
     } else if (literal_token_type == integer) {
-        printf("%d\n", literal_token_value_type.value.integer);
+        printf("%d", literal_token_value_type.value.integer);
 
     } else if (literal_token_type == floating) {
-        printf("%f\n", literal_token_value_type.value.floating);
+        printf("%f", literal_token_value_type.value.floating);
 
     } else if (literal_token_type == boolean) {
-        printf("%d\n", literal_token_value_type.value.boolean);
+        printf("%d", literal_token_value_type.value.boolean);
 
     } else if (literal_token_type == character) {
-        printf("%c\n", literal_token_value_type.value.character);
+        printf("%c", literal_token_value_type.value.character);
     }
 
 }
@@ -79,7 +78,6 @@ Lexeme* lexemes_from_tokens(int line_number, char *value, LiteralTokenType type,
     } else {
         literal_value.char_sequence = strdup(value);
         literal_type = char_sequence;
-
     }
 
     LiteralTokenValueType literal_token_value_type = { literal_value, literal_type };
@@ -93,16 +91,21 @@ Lexeme* lexemes_from_tokens(int line_number, char *value, LiteralTokenType type,
 
 void free_lexeme(Lexeme *lexeme) {
     if (lexeme != NULL) {
-        if (lexeme->literal_token_value_type.value.char_sequence != NULL) {
+        if (lexeme->literal_token_value_type.type == char_sequence) {
             free(lexeme->literal_token_value_type.value.char_sequence);
         }
+
+        if (lexeme->literal_token_value_type.type == character) {
+            free(lexeme->literal_token_value_type.value.character);
+        }
+
         free(lexeme);
     }
 }
 
 char* strip_quotation_marks(char *value) {
     char *new_str = value;
-    new_str++; /* removing first item */
-    new_str[strlen(new_str) - 1] = '\0';  /* removing last item */
+    new_str++;
+    new_str[strlen(new_str) - 1] = '\0';
     return new_str;
 }
