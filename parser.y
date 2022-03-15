@@ -201,14 +201,22 @@ listaParametros:
 // Definição da seção 3.3;
 blocoComandos:
       '{' comando '}' { $$ = $2 ;}
+      | '{' '}' { $$ = NULL; }
       ;
 
 comando:
       comandoSimples ';' comando {
-            // TO DO: A CORRIGIR - MESMO problema la de cima
-            $$ = create_ast_node(no_type, NULL, $1, $3, NULL, NULL);
-      }
-    | { $$ = NULL ;}
+                  if ( $3 == NULL ) {
+                        $$ = $1;
+                  }
+                  if( $1 != NULL  ) {
+                        append_node( $1, $3 );
+                        $$ = $1;
+                  } else {
+                        $$ = $3;
+                  }
+            }
+    | comandoSimples ';' { $$ = $1; }
     ;
 
 comandoSimples:
