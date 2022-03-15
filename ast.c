@@ -131,8 +131,9 @@ void print_node_type(NodeType node_type) {
         case var_attribution:
             printf( "=" );
             break;
-        // case var_initializer:
-        //     break;
+        case var_initializer:
+            printf( "<=" );
+            break;
         case function_call:
             printf("call ");
             break;
