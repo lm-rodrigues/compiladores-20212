@@ -67,8 +67,8 @@ void tree_to_csv(AST_NODE *tree) {
 void exporta(void *tree) {
     AST_NODE *root = (AST_NODE *) tree;
 
+    tree_to_csv(root);
     node_to_label(root);
-    // tree_to_csv(root);
 }
 
 void libera(void *tree) {
