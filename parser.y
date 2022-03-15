@@ -322,8 +322,8 @@ fluxoControle:
 
 
 expressao:
-      aritmeticas       { $$ = $1 ;}
-    | operacoes         { $$ = $1 ;}
+      aritmeticas
+    | operacoes
     | '(' expressao ')' { $$ = $2 ;}
     ;
 
@@ -332,7 +332,7 @@ aritmeticas:
     | TK_IDENTIFICADOR '[' expressao ']'  { $$ = create_ast_node( no_type, $1, $3, NULL, NULL, NULL )   ;}
     | TK_LIT_INT                          { $$ = create_ast_node( no_type, $1, NULL, NULL, NULL, NULL ) ;}
     | TK_LIT_FLOAT                        { $$ = create_ast_node( no_type, $1, NULL, NULL, NULL, NULL ) ;}
-    | chamadaFuncao                       { $$ = $1                                                     ;}
+    | chamadaFuncao
     ;
 
 operacoes:
