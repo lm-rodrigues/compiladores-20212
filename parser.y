@@ -120,15 +120,16 @@ programa:
 
 decList:
       dec decList {
-                    if( $1 == NULL ) {
-                        $$ = $2;
-                    }
-                    if( $2 != NULL ) {
-                        append_node( $1, $2 );
-                    }
-
-                    $$ = $1;
+                  if( $2 == NULL ) {
+                        $$ = $1;
                   }
+                  if( $1 != NULL ) {
+                        append_node( $1, $2 );
+                        $$ = $1;
+                  } else {
+                        $$ = $2;
+                  }
+            }
     |             { $$ = NULL ;}
     ;
 
@@ -277,7 +278,9 @@ atribuicao:
 
 
 operacoesEntrada:
-      TK_PR_INPUT TK_IDENTIFICADOR { $$ = create_ast_node(cmd_input, NULL, $2, NULL, NULL, NULL) ;}
+      TK_PR_INPUT TK_IDENTIFICADOR { $$ = create_ast_node(cmd_input, NULL,
+                  create_ast_node( no_type, $2, NULL, NULL, NULL, NULL ),
+                  NULL, NULL, NULL) ;}
       ;
 
 operacoesSaida:
@@ -329,7 +332,9 @@ expressao:
 
 aritmeticas:
       TK_IDENTIFICADOR                    { $$ = create_ast_node( no_type, $1, NULL, NULL, NULL, NULL ) ;}
-    | TK_IDENTIFICADOR '[' expressao ']'  { $$ = create_ast_node( no_type, $1, $3, NULL, NULL, NULL )   ;}
+    | TK_IDENTIFICADOR '[' expressao ']'  { $$ = create_ast_node( vec_index, NULL,
+                                                      create_ast_node(no_type, $1, NULL, NULL, NULL, NULL),
+                                                      $3, NULL, NULL )   ;}
     | TK_LIT_INT                          { $$ = create_ast_node( no_type, $1, NULL, NULL, NULL, NULL ) ;}
     | TK_LIT_FLOAT                        { $$ = create_ast_node( no_type, $1, NULL, NULL, NULL, NULL ) ;}
     | chamadaFuncao
