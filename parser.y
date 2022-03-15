@@ -119,8 +119,16 @@ programa:
       ;
 
 decList:
-      dec decList { if($1 == NULL){ if($2 == NULL){ $$ = NULL; } $$ = $2; } else if($2 == NULL){ $$ = $1; }
-                    $$ = create_ast_node(no_type, NULL, $1, $2, NULL, NULL) ;}
+      dec decList {
+                    if( $1 == NULL ) {
+                        $$ = $2;
+                    }
+                    if( $2 != NULL ) {
+                        append_node( $1, $2 );
+                    }
+
+                    $$ = $1;
+                  }
     |             { $$ = NULL ;}
     ;
 
