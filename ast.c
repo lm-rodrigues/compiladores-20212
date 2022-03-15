@@ -21,8 +21,13 @@ struct AST_NODE *create_ast_node(NodeType type, Lexeme *lexeme, struct AST_NODE 
     new_node->son[1] = s1;
     new_node->son[2] = s2;
     new_node->son[3] = s3;
+    new_node->son[4] = NULL;
 
     return new_node;
+}
+
+void append_node( struct AST_NODE *s0, struct AST_NODE *s1 ) {
+    s0->son[4] = s1;
 }
 
 void node_to_label(AST_NODE *tree) {
