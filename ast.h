@@ -6,7 +6,7 @@ Leonardo Marques Rodrigues - 00213751
 #ifndef ARVORE_H
 #define ARVORE_H
 
-#define MAX_SONS 4
+#define MAX_SONS 5
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -32,16 +32,17 @@ typedef enum {
 
 } NodeType;
 
-typedef struct ast_node {
+typedef struct AST_NODE {
     NodeType node_type;
-    Lexeme *lexeme;
-    struct AST_NODE *son[MAX_SONS];
+    Lexeme* lexeme;
+    struct AST_NODE* son[MAX_SONS];
 
 } AST_NODE;
 
 struct AST_NODE *create_ast_node( NodeType type, Lexeme *lexeme, struct AST_NODE *s0, struct AST_NODE *s1, struct AST_NODE *s2, struct AST_NODE *s3);
+void append_node( struct AST_NODE *s0, struct AST_NODE *s1 );
 
-void export_tree(void *tree);
+void exporta(void *tree);
 void tree_to_csv(AST_NODE *tree);
 void node_to_label(AST_NODE *tree);
 void free_tree(AST_NODE *tree);
