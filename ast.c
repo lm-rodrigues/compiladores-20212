@@ -37,11 +37,11 @@ void node_to_label(AST_NODE *tree) {
             print_literal_value(tree->lexeme->literal_token_value_type);
         }
         printf("\"]\n");
-  }
+    }
 
-  for(son_index = 0; son_index < MAX_SONS; son_index++) {
-    node_to_label(tree->son[son_index]);
-  }
+    for(son_index = 0; son_index < MAX_SONS; son_index++) {
+        node_to_label(tree->son[son_index]);
+    }
 }
 
 void tree_to_csv(AST_NODE *tree) {
