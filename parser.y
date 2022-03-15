@@ -78,7 +78,6 @@
 %type <tree> dec
 %type <tree> identificadorOuLiteral
 %type <tree> declaracaoFuncao
-%type <tree> listaParametros
 %type <tree> comando
 %type <tree> comandoSimples
 %type <tree> declaracaoVariavelLocal
@@ -97,14 +96,10 @@
 %type <tree> binarios
 %type <tree> ternarios
 %type <tree> variavelLocal
-%type <tree> declaracaoVariavelGlobal
-%type <tree> opcionalListVarGlobal
 %type <tree> blocoComandos
 %type <tree> operacoesEntrada
 %type <tree> operacoesSaida
 %type <tree> operacoesRetorno
-%type <tree> opcionalInit
-%type <tree> parametros
 
 // Precedencias:
 %left '<' '>' TK_OC_EQ TK_OC_NE TK_OC_GE TK_OC_LE
