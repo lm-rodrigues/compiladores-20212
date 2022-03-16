@@ -10,7 +10,7 @@
     int get_line_number(void);
 %}
 
-// Lex states definitions
+ // Lex states definitions
 %x MULTILINE_COMMENT
 
 %%
