@@ -316,19 +316,17 @@ comandoShift:
       identificador TK_OC_SR numero { $$ = create_ast_node(no_type, $2, $1, $3, NULL, NULL ) ;}
     | identificador TK_OC_SL numero { $$ = create_ast_node(no_type, $2, $1, $3, NULL, NULL ) ;}
     | identificador '[' expressao ']' TK_OC_SL numero {
-          $$ = create_ast_node( vec_index, NULL,
-                              $1,
-                              $3,
-                              $6,
-                              NULL);
-      }
+          $$ = create_ast_node(no_type, $5,
+                        create_ast_node( vec_index, NULL, $1, $3, NULL, NULL),
+                        $6,
+                        NULL,
+                        NULL );}
     | identificador '[' expressao ']' TK_OC_SR numero {
-          $$ = create_ast_node( vec_index, NULL,
-                              $1,
-                              $3,
-                              $6,
-                              NULL);
-      }
+          $$ = create_ast_node(no_type, $5,
+                        create_ast_node( vec_index, NULL, $1, $3, NULL, NULL),
+                        $6,
+                        NULL,
+                        NULL );}
     ;
 
 
