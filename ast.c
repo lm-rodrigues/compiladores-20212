@@ -10,10 +10,6 @@ Leonardo Marques Rodrigues - 00213751
 struct AST_NODE *create_ast_node(NodeType type, Lexeme *lexeme, struct AST_NODE *s0, struct AST_NODE *s1, struct AST_NODE *s2, struct AST_NODE *s3) {
     AST_NODE *new_node;
     new_node = malloc(sizeof(AST_NODE));
-    // new_node->lexeme = malloc(sizeof(lexeme));
-    if ( lexeme != NULL ) {
-        print_lexeme( *lexeme );
-    }
 
     new_node->node_type = type;
     new_node->lexeme = lexeme;
@@ -34,10 +30,10 @@ void node_to_label(AST_NODE *tree) {
     if (tree == NULL) { return ;}
     int son_index = 0;
 
-    if (tree->lexeme != NULL) {
+    if (tree->lexeme != NULL || tree->node_type != no_type ) {
         printf("%p [label=\"", tree);
         if (tree->node_type != no_type) {
-            print_node_type(tree->node_type);
+            print_node_type(tree->node_type, tree->lexeme );
         } else {
             print_literal_value(tree->lexeme->literal_token_value_type);
         }
@@ -73,7 +69,6 @@ void exporta(void *tree) {
 
 void libera(void *tree) {
   free_tree((AST_NODE *) tree);
-
 }
 
 void free_tree(AST_NODE *tree) {
@@ -92,7 +87,7 @@ void free_tree(AST_NODE *tree) {
 }
 
 
-void print_node_type(NodeType node_type) {
+void print_node_type(NodeType node_type, Lexeme* lexeme) {
 
     switch (node_type){
 
@@ -136,6 +131,7 @@ void print_node_type(NodeType node_type) {
             break;
         case function_call:
             printf("call ");
+            print_literal_value( lexeme->literal_token_value_type);
             break;
         default:
             break;

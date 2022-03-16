@@ -77,6 +77,7 @@
 %type <tree> decList
 %type <tree> dec
 %type <tree> identificadorOuLiteral
+%type <tree> identificador
 %type <tree> declaracaoFuncao
 %type <tree> comando
 %type <tree> comandoSimples
@@ -170,36 +171,37 @@ numero:
       TK_LIT_INT { $$ = create_ast_node( no_type, $1, NULL, NULL, NULL, NULL) ;};
 
 
-// Declaração de Variavel Global - Não entram na AST;
+// Declaração de Variavel Global - Não entram na AST - Precisamos liberar o lexeme criado no scanner;
 declaracaoVariavelGlobal:
-      opcionalStatic tipo TK_IDENTIFICADOR opcionalListVarGlobal ';'
-    | opcionalStatic tipo TK_IDENTIFICADOR '[' numero ']' opcionalListVarGlobal ';'
+      opcionalStatic tipo TK_IDENTIFICADOR opcionalListVarGlobal ';' { free_lexeme( $3 ); }
+    | opcionalStatic tipo TK_IDENTIFICADOR '[' numero ']' opcionalListVarGlobal ';' { free_lexeme( $3 ); }
     ;
 
 opcionalListVarGlobal:
-      ',' TK_IDENTIFICADOR opcionalListVarGlobal
-    | ',' TK_IDENTIFICADOR '[' numero ']' opcionalListVarGlobal
+      ',' TK_IDENTIFICADOR opcionalListVarGlobal { free_lexeme( $2 ); }
+    | ',' TK_IDENTIFICADOR '[' numero ']' opcionalListVarGlobal { free_lexeme( $2 ); }
     |
     ;
 
 
-// Definição da seção 3.2;
 declaracaoFuncao:
         opcionalStatic tipo TK_IDENTIFICADOR '(' parametros ')' blocoComandos {
-              $$ = create_ast_node( no_type, $3, $7, NULL, NULL, NULL) ;}
+            $$ = create_ast_node( no_type, $3, $7, NULL, NULL, NULL) ;}
       | opcionalStatic tipo TK_IDENTIFICADOR '(' ')' blocoComandos            {
             $$ = create_ast_node( no_type, $3, $6, NULL, NULL, NULL)  ;}
       ;
 
+
+// Não entram na AST - Precisamos liberar o lexeme criado no scanner;
 parametros:
-      opcionalConst tipo TK_IDENTIFICADOR listaParametros
+      opcionalConst tipo TK_IDENTIFICADOR listaParametros { free_lexeme( $3 ); }
       ;
 listaParametros:
         ',' parametros
       |
       ;
 
-// Definição da seção 3.3;
+
 blocoComandos:
       '{' comando '}' { $$ = $2 ;}
       | '{' '}' { $$ = NULL; }
@@ -220,6 +222,8 @@ comando:
     | comandoSimples ';' { $$ = $1; }
     ;
 
+
+// Todos
 comandoSimples:
       declaracaoVariavelLocal
     | atribuicao
@@ -240,6 +244,7 @@ declaracaoVariavelLocal:
 
 variavelLocal:
       TK_IDENTIFICADOR listaVar {
+            free_lexeme( $1 );
             $$ = NULL;
       }
       | TK_IDENTIFICADOR TK_OC_LE identificadorOuLiteral listaVar {
@@ -259,20 +264,19 @@ listaVar:
 
 
 atribuicao:
-      TK_IDENTIFICADOR '=' expressao                   {
-            $$ = create_ast_node( var_attribution, NULL, create_ast_node( no_type, $1, NULL, NULL, NULL, NULL ), $3, NULL, NULL);
+      identificador '=' expressao                   {
+            $$ = create_ast_node( var_attribution, $2, $1, $3, NULL, NULL);
       }
-    | TK_IDENTIFICADOR '[' expressao ']' '=' expressao {
-          $$ = create_ast_node( var_attribution, NULL,
-                       create_ast_node( vec_index, NULL,
-                              create_ast_node( no_type, $1, NULL, NULL, NULL, NULL ),
-                                    $3,
-                                    NULL,
-                                    NULL),
-                              $6,
-                              NULL,
-                              NULL
-            );
+    | identificador '[' expressao ']' '=' expressao {
+          $$ = create_ast_node( var_attribution, $5,
+                  create_ast_node( vec_index, $2,
+                        $1,
+                        $6,
+                        NULL,
+                        NULL),
+                  NULL,
+                  NULL,
+                  NULL);
       }
     ;
 
@@ -302,9 +306,28 @@ entradaSeguinte:
     ;
 
 
+identificador:
+      TK_IDENTIFICADOR { $$ = create_ast_node(no_type, $1, NULL, NULL, NULL, NULL) ;}
+    ;
+
+
 comandoShift:
-      TK_IDENTIFICADOR TK_OC_SR numero { $$ = create_ast_node(no_type, $2, create_ast_node(no_type, $1, NULL, NULL, NULL, NULL), $3, NULL, NULL ) ;}
-    | TK_IDENTIFICADOR TK_OC_SL numero { $$ = create_ast_node(no_type, $2, create_ast_node(no_type, $1, NULL, NULL, NULL, NULL), $3, NULL, NULL ) ;}
+      identificador TK_OC_SR numero { $$ = create_ast_node(no_type, $2, $1, $3, NULL, NULL ) ;}
+    | identificador TK_OC_SL numero { $$ = create_ast_node(no_type, $2, $1, $3, NULL, NULL ) ;}
+    | identificador '[' expressao ']' TK_OC_SL numero {
+          $$ = create_ast_node( vec_index, NULL,
+                              $1,
+                              $3,
+                              $6,
+                              NULL);
+      }
+    | identificador '[' expressao ']' TK_OC_SR numero {
+          $$ = create_ast_node( vec_index, NULL,
+                              $1,
+                              $3,
+                              $6,
+                              NULL);
+      }
     ;
 
 
@@ -331,9 +354,9 @@ expressao:
     ;
 
 aritmeticas:
-      TK_IDENTIFICADOR                    { $$ = create_ast_node( no_type, $1, NULL, NULL, NULL, NULL ) ;}
-    | TK_IDENTIFICADOR '[' expressao ']'  { $$ = create_ast_node( vec_index, NULL,
-                                                      create_ast_node(no_type, $1, NULL, NULL, NULL, NULL),
+      identificador
+    | identificador '[' expressao ']'     { $$ = create_ast_node( vec_index, $2,
+                                                      $1,
                                                       $3, NULL, NULL )   ;}
     | TK_LIT_INT                          { $$ = create_ast_node( no_type, $1, NULL, NULL, NULL, NULL ) ;}
     | TK_LIT_FLOAT                        { $$ = create_ast_node( no_type, $1, NULL, NULL, NULL, NULL ) ;}
