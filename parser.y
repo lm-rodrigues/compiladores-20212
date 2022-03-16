@@ -174,12 +174,12 @@ numero:
 // Declaração de Variavel Global - Não entram na AST - Precisamos liberar o lexeme criado no scanner;
 declaracaoVariavelGlobal:
       opcionalStatic tipo TK_IDENTIFICADOR opcionalListVarGlobal ';' { free_lexeme( $3 ); }
-    | opcionalStatic tipo TK_IDENTIFICADOR '[' numero ']' opcionalListVarGlobal ';' { free_lexeme( $3 ); }
+    | opcionalStatic tipo TK_IDENTIFICADOR '[' TK_LIT_INT ']' opcionalListVarGlobal ';' { free_lexeme( $3 ); free_lexeme( $5 ); }
     ;
 
 opcionalListVarGlobal:
       ',' TK_IDENTIFICADOR opcionalListVarGlobal { free_lexeme( $2 ); }
-    | ',' TK_IDENTIFICADOR '[' numero ']' opcionalListVarGlobal { free_lexeme( $2 ); }
+    | ',' TK_IDENTIFICADOR '[' TK_LIT_INT ']' opcionalListVarGlobal { free_lexeme( $2 ); free_lexeme( $4 ); }
     |
     ;
 
@@ -194,7 +194,7 @@ declaracaoFuncao:
 
 // Não entram na AST - Precisamos liberar o lexeme criado no scanner;
 parametros:
-      opcionalConst tipo TK_IDENTIFICADOR listaParametros { free_lexeme( $3 ); }
+        opcionalConst tipo TK_IDENTIFICADOR listaParametros { free_lexeme( $3 ); }
       ;
 listaParametros:
         ',' parametros
@@ -203,7 +203,7 @@ listaParametros:
 
 
 blocoComandos:
-      '{' comando '}' { $$ = $2 ;}
+        '{' comando '}' { $$ = $2 ;}
       | '{' '}' { $$ = NULL; }
       ;
 
@@ -269,12 +269,12 @@ atribuicao:
       }
     | identificador '[' expressao ']' '=' expressao {
           $$ = create_ast_node( var_attribution, $5,
-                  create_ast_node( vec_index, $2,
+                  create_ast_node( vec_index, NULL,
                         $1,
-                        $6,
+                        $3,
                         NULL,
                         NULL),
-                  NULL,
+                  $6,
                   NULL,
                   NULL);
       }
@@ -294,10 +294,11 @@ operacoesSaida:
 
 chamadaFuncao:
       TK_IDENTIFICADOR '(' listaEntradas ')' { $$ = create_ast_node(function_call, $1, $3, NULL, NULL, NULL) ;}
-      ;
+    ;
+
 listaEntradas:
-      TK_IDENTIFICADOR entradaSeguinte { $$ = create_ast_node(no_type, $1, $2, NULL, NULL, NULL) ;}
-    |                                  { $$ = NULL                                               ;}
+      expressao entradaSeguinte       { if( $2 != NULL  ) { append_node( $1, $2 ); }  $$ = $1;  ;}
+    |                                 { $$ = NULL                                               ;}
     ;
 
 entradaSeguinte:
@@ -355,9 +356,7 @@ expressao:
 
 aritmeticas:
       identificador
-    | identificador '[' expressao ']'     { $$ = create_ast_node( vec_index, $2,
-                                                      $1,
-                                                      $3, NULL, NULL )   ;}
+    | identificador '[' expressao ']'     { $$ = create_ast_node( vec_index, NULL, $1, $3, NULL, NULL ) ;}
     | TK_LIT_INT                          { $$ = create_ast_node( no_type, $1, NULL, NULL, NULL, NULL ) ;}
     | TK_LIT_FLOAT                        { $$ = create_ast_node( no_type, $1, NULL, NULL, NULL, NULL ) ;}
     | chamadaFuncao
@@ -370,13 +369,13 @@ operacoes:
     ;
 
 unarios:
-     '+' expressao { $$ = create_ast_node( no_type, $1, $2, NULL, NULL, NULL) ;}
-    |'-' expressao { $$ = create_ast_node( no_type, $1, $2, NULL, NULL, NULL) ;}
-    |'!' expressao { $$ = create_ast_node( no_type, $1, $2, NULL, NULL, NULL) ;}
-    |'&' expressao { $$ = create_ast_node( no_type, $1, $2, NULL, NULL, NULL) ;}
-    |'*' expressao { $$ = create_ast_node( no_type, $1, $2, NULL, NULL, NULL) ;}
-    |'?' expressao { $$ = create_ast_node( no_type, $1, $2, NULL, NULL, NULL) ;}
-    |'#' expressao { $$ = create_ast_node( no_type, $1, $2, NULL, NULL, NULL) ;}
+      '+' expressao { $$ = create_ast_node( no_type, $1, $2, NULL, NULL, NULL) ;}
+    | '-' expressao { $$ = create_ast_node( no_type, $1, $2, NULL, NULL, NULL) ;}
+    | '!' expressao { $$ = create_ast_node( no_type, $1, $2, NULL, NULL, NULL) ;}
+    | '&' expressao { $$ = create_ast_node( no_type, $1, $2, NULL, NULL, NULL) ;}
+    | '*' expressao { $$ = create_ast_node( no_type, $1, $2, NULL, NULL, NULL) ;}
+    | '?' expressao { $$ = create_ast_node( no_type, $1, $2, NULL, NULL, NULL) ;}
+    | '#' expressao { $$ = create_ast_node( no_type, $1, $2, NULL, NULL, NULL) ;}
     ;
 
 binarios:

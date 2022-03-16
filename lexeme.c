@@ -95,10 +95,6 @@ void free_lexeme(Lexeme *lexeme) {
             free(lexeme->literal_token_value_type.value.char_sequence);
         }
 
-        if (lexeme->literal_token_value_type.type == character) {
-            free(lexeme->literal_token_value_type.value.character);
-        }
-
         free(lexeme);
     }
 }
