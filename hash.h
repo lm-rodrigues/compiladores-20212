@@ -38,7 +38,8 @@ void hashInit(void);
 int hashAddres(char *text);
 HASH_NODE *hashFind(char *text);
 HASH_NODE *hashInsert(int lineNumber, int kind, int type, int size, char *text);
-HASH_NODE *hashInsertFunc(int lineNumber, int kind, int type, int size, char *text, ARGUMENT argument[], int argumentType[]);
+// Ainda não to usando:
+// HASH_NODE *hashInsertFunc(int lineNumber, int kind, int type, int size, char *text, ARGUMENT argument[], int argumentType[]);
 void hashPrint();
 
 #endif
