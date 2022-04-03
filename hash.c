@@ -61,28 +61,31 @@ HASH_NODE *hashInsert(int lineNumber, int kind, int type, int size, char *text) 
     return new_node;
 }
 
-HASH_NODE *hashInsertFunc(int lineNumber, int kind, int type, int size, char *text, ARGUMENT argument[], int argumentType[]) {
-    HASH_NODE *new_node;
-    if ((new_node = hashFind(text))!=0) return new_node;
 
-    int address = hashAddress(text);
+// não é usado em lugar nenhum ainda, why?
+// PRA QUE QUE SERVE?
+// HASH_NODE *hashInsertFunc(int lineNumber, int kind, int type, int size, char *text, ARGUMENT argument[], int argumentType[]) {
+//     HASH_NODE *new_node;
+//     if ((new_node = hashFind(text))!=0) return new_node;
 
-    new_node = (HASH_NODE*) calloc(1, sizeof(HASH_NODE));
-    new_node->lineNumber = lineNumber;
-    new_node->kind = kind;
-    new_node->type = type;
-    new_node->size = size;
+//     int address = hashAddress(text);
 
-    memcpy(new_node->argument, argument, sizeof(ARGUMENT) * 1024);
-    memcpy(new_node->argumentType, argumentType, sizeof(ARGUMENT) * 1024);
+//     new_node = (HASH_NODE*) calloc(1, sizeof(HASH_NODE));
+//     new_node->lineNumber = lineNumber;
+//     new_node->kind = kind;
+//     new_node->type = type;
+//     new_node->size = size;
 
-	new_node->text = (char*) calloc(strlen(text)+1, sizeof(char));
-	strcpy(new_node->text, text);
-	new_node->next = Table[address];
-	Table[address] = new_node;
+//     memcpy(new_node->argument, argument, sizeof(ARGUMENT) * 1024);
+//     memcpy(new_node->argumentType, argumentType, sizeof(ARGUMENT) * 1024);
 
-    return new_node;
-}
+// 	new_node->text = (char*) calloc(strlen(text)+1, sizeof(char));
+// 	strcpy(new_node->text, text);
+// 	new_node->next = Table[address];
+// 	Table[address] = new_node;
+
+//     return new_node;
+// }
 
 void hashPrint(void)
 {
