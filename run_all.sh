@@ -1,12 +1,12 @@
 #!/bin/bash
 
-for i in {0..9}
+for i in {0..41}
 do
-    ./etapa3 < ./testes/w0$i > ./testes/w0$i-resultado
+    ./etapa4 < ./testes-e4/certos/cert$i > ./testes-e4/certos/cert$i-resultado
 done
 
 
-for i in {10..76}
+for i in {0..74}
 do
-    ./etapa3 < ./testes/w$i > ./testes/w$i-resultado
+    ./etapa4 < ./testes-e4/com-erros/err$i > ./testes-e4/com-erros/err$i-resultado
 done
