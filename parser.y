@@ -100,7 +100,6 @@
 %type <tree> listaEntradas
 %type <tree> entradaSeguinte
 %type <tree> comandoShift
-%type <tree> numero
 %type <tree> fluxoControle
 %type <tree> expressao
 %type <tree> aritmeticas
@@ -185,82 +184,78 @@ opcionalConst:
     |
     ;
 
-numero:
-      TK_LIT_INT { $$ = create_ast_leaf( no_type, $1 ); };
-
-
 // Declaração de Variavel Global - Não entram na AST - Precisamos liberar o lexeme criado no scanner;
 declaracaoVariavelGlobal:
       opcionalStatic TK_PR_INT TK_IDENTIFICADOR opcionalListVarGlobal ';' {
-        checkAlreadyDeclared($3->value->char_sequence, get_line_number(), VARGLOBAL);
+        checkAlreadyDeclared($3->literal_token_value_type.value.char_sequence, get_line_number(), VARGLOBAL);
 
         // se não deu exit na checkAlreadyDeclared, significa que ainda não temos essa variavel,
         // então vamos inseri-la na nossa hash
-        hashInsert(get_line_number(), VARGLOBAL, TK_PR_INT, sizeof(int), $3->value->char_sequence);
+        hashInsert(get_line_number(), VARGLOBAL, TK_PR_INT, sizeof(int), $3->literal_token_value_type.value.char_sequence);
 
         // abaixo é codigo que já constava na E3
         free_lexeme( $3 );
         $$ = NULL;
     }
     | opcionalStatic TK_PR_FLOAT TK_IDENTIFICADOR opcionalListVarGlobal ';' {
-        checkAlreadyDeclared($3->value->char_sequence, get_line_number(), VARGLOBAL);
-        hashInsert(get_line_number(), VARGLOBAL, TK_PR_FLOAT, sizeof(float), $3->value->char_sequence);
+        checkAlreadyDeclared($3->literal_token_value_type.value.char_sequence, get_line_number(), VARGLOBAL);
+        hashInsert(get_line_number(), VARGLOBAL, TK_PR_FLOAT, sizeof(float), $3->literal_token_value_type.value.char_sequence);
 
         free_lexeme( $3 );
         $$ = NULL;
     }
     | opcionalStatic TK_PR_CHAR TK_IDENTIFICADOR opcionalListVarGlobal ';' {
-        checkAlreadyDeclared($3->value->char_sequence, get_line_number(), VARGLOBAL);
-        hashInsert(get_line_number(), VARGLOBAL, TK_PR_CHAR, sizeof(float), $3->value->char_sequence);
+        checkAlreadyDeclared($3->literal_token_value_type.value.char_sequence, get_line_number(), VARGLOBAL);
+        hashInsert(get_line_number(), VARGLOBAL, TK_PR_CHAR, sizeof(float), $3->literal_token_value_type.value.char_sequence);
 
         free_lexeme( $3 );
         $$ = NULL;
     }
     | opcionalStatic TK_PR_BOOL TK_IDENTIFICADOR opcionalListVarGlobal ';' {
-        checkAlreadyDeclared($3->value->char_sequence, get_line_number(), VARGLOBAL);
-        hashInsert(get_line_number(), VARGLOBAL, TK_PR_BOOL, sizeof(char), $3->value->char_sequence);
+        checkAlreadyDeclared($3->literal_token_value_type.value.char_sequence, get_line_number(), VARGLOBAL);
+        hashInsert(get_line_number(), VARGLOBAL, TK_PR_BOOL, sizeof(char), $3->literal_token_value_type.value.char_sequence);
 
         free_lexeme( $3 );
         $$ = NULL;
     }
     | opcionalStatic TK_PR_STRING TK_IDENTIFICADOR opcionalListVarGlobal ';' {
-        checkAlreadyDeclared($3->value->char_sequence, get_line_number(), VARGLOBAL);
-        hashInsert(get_line_number(), VARGLOBAL, TK_PR_STRING, 89, $3->value->char_sequence);
+        checkAlreadyDeclared($3->literal_token_value_type.value.char_sequence, get_line_number(), VARGLOBAL);
+        hashInsert(get_line_number(), VARGLOBAL, TK_PR_STRING, 89, $3->literal_token_value_type.value.char_sequence);
 
         free_lexeme( $3 );
         $$ = NULL;
     }
     | opcionalStatic TK_PR_INT TK_IDENTIFICADOR '[' TK_LIT_INT ']' opcionalListVarGlobal ';' {
-        checkAlreadyDeclared($3->value->char_sequence, get_line_number(), VARGLOBAL);
-        hashInsert(get_line_number(), VARGLOBAL, TK_PR_STRING, 89, $3->value->char_sequence);
+        checkAlreadyDeclared($3->literal_token_value_type.value.char_sequence, get_line_number(), VARGLOBAL);
+        hashInsert(get_line_number(), VARGLOBAL, TK_PR_STRING, 89, $3->literal_token_value_type.value.char_sequence);
 
         free_lexeme( $3 );
         free_lexeme( $5 );
         $$ = NULL;
     }
     | opcionalStatic TK_PR_FLOAT TK_IDENTIFICADOR '[' TK_LIT_INT ']' opcionalListVarGlobal ';' {
-        checkAlreadyDeclared($3->value->char_sequence, get_line_number(), VARGLOBAL);
-        hashInsert(get_line_number(), VARGLOBAL, TK_PR_STRING, 89, $3->value->char_sequence);
+        checkAlreadyDeclared($3->literal_token_value_type.value.char_sequence, get_line_number(), VARGLOBAL);
+        hashInsert(get_line_number(), VARGLOBAL, TK_PR_STRING, 89, $3->literal_token_value_type.value.char_sequence);
         free_lexeme( $3 ); free_lexeme( $5 ); $$ = NULL;
     }
     | opcionalStatic TK_PR_BOOL TK_IDENTIFICADOR '[' TK_LIT_INT ']' opcionalListVarGlobal ';' {
-        checkAlreadyDeclared($3->value->char_sequence, get_line_number(), VARGLOBAL);
-        hashInsert(get_line_number(), VARGLOBAL, TK_PR_STRING, 89, $3->value->char_sequence);
+        checkAlreadyDeclared($3->literal_token_value_type.value.char_sequence, get_line_number(), VARGLOBAL);
+        hashInsert(get_line_number(), VARGLOBAL, TK_PR_STRING, 89, $3->literal_token_value_type.value.char_sequence);
 
         free_lexeme( $3 );
         free_lexeme( $5 );
         $$ = NULL;
     }
     | opcionalStatic TK_PR_CHAR TK_IDENTIFICADOR '[' TK_LIT_INT ']' opcionalListVarGlobal ';' {
-        checkAlreadyDeclared($3->value->char_sequence, get_line_number(), VARGLOBAL);
-        hashInsert(get_line_number(), VARGLOBAL, TK_PR_STRING, 89, $3->value->char_sequence);
+        checkAlreadyDeclared($3->literal_token_value_type.value.char_sequence, get_line_number(), VARGLOBAL);
+        hashInsert(get_line_number(), VARGLOBAL, TK_PR_STRING, 89, $3->literal_token_value_type.value.char_sequence);
 
         free_lexeme( $3 );
         free_lexeme( $5 );
         $$ = NULL;
     }
     | opcionalStatic TK_PR_STRING TK_IDENTIFICADOR '[' TK_LIT_INT ']' opcionalListVarGlobal ';' {
-        printf( "\nErro semantico! Linha %d: O vetor global %s não pode ser do tipo string.", get_line_number(), $3->value->char_sequence);
+        printf( "\nErro semantico! Linha %d: O vetor global %s não pode ser do tipo string.", get_line_number(), $3->literal_token_value_type.value.char_sequence);
 
         free_lexeme( $3 ); free_lexeme( $5 );
 
@@ -278,9 +273,9 @@ opcionalListVarGlobal:
 
 declaracaoFuncao:
       opcionalStatic TK_PR_INT TK_IDENTIFICADOR '(' parametros ')' blocoComandos {
-            checkAlreadyDeclared($3->value->char_sequence, get_line_number(), FUNCAO);
+            checkAlreadyDeclared($3->literal_token_value_type.value.char_sequence, get_line_number(), FUNCAO);
 
-            hashInsert(get_line_number(), FUNCAO, TK_PR_INT, sizeof(int), $3->value->char_sequence);
+            hashInsert(get_line_number(), FUNCAO, TK_PR_INT, sizeof(int), $3->literal_token_value_type.value.char_sequence);
 
             // Olhar com calma o que essa func de baixo faz, não lembro exatamente pra o que é mas é importante
             removeReturnType(TK_PR_INT);
@@ -288,9 +283,9 @@ declaracaoFuncao:
             $$ = create_ast_node( no_type, $3, $7, NULL, NULL, NULL) ;
     }
     | opcionalStatic TK_PR_FLOAT TK_IDENTIFICADOR '(' parametros ')' blocoComandos {
-            checkAlreadyDeclared($3->value->char_sequence, get_line_number(), FUNCAO);
+            checkAlreadyDeclared($3->literal_token_value_type.value.char_sequence, get_line_number(), FUNCAO);
 
-            hashInsert(get_line_number(), FUNCAO, TK_PR_FLOAT, sizeof(float), $3->value->char_sequence);
+            hashInsert(get_line_number(), FUNCAO, TK_PR_FLOAT, sizeof(float), $3->literal_token_value_type.value.char_sequence);
 
             // Olhar com calma o que essa func de baixo faz, não lembro exatamente pra o que é mas é importante
             removeReturnType(TK_PR_FLOAT);
@@ -298,23 +293,36 @@ declaracaoFuncao:
             $$ = create_ast_node( no_type, $3, $7, NULL, NULL, NULL) ;
     }
     | opcionalStatic TK_PR_CHAR TK_IDENTIFICADOR '(' parametros ')' blocoComandos {
-            checkAlreadyDeclared($3->value->char_sequence, get_line_number(), FUNCAO);
+            checkAlreadyDeclared($3->literal_token_value_type.value.char_sequence, get_line_number(), FUNCAO);
 
-            hashInsert(get_line_number(), FUNCAO, TK_PR_CHAR, sizeof(char), $3->value->char_sequence);
+            hashInsert(get_line_number(), FUNCAO, TK_PR_CHAR, sizeof(char), $3->literal_token_value_type.value.char_sequence);
 
             // Olhar com calma o que essa func de baixo faz, não lembro exatamente pra o que é mas é importante
             removeReturnType(TK_PR_CHAR);
             $$ = create_ast_node( no_type, $3, $7, NULL, NULL, NULL) ;
     }
     | opcionalStatic TK_PR_BOOL TK_IDENTIFICADOR '(' parametros ')' blocoComandos {
-            checkAlreadyDeclared($3->value->char_sequence, get_line_number(), FUNCAO);
+            checkAlreadyDeclared($3->literal_token_value_type.value.char_sequence, get_line_number(), FUNCAO);
 
-            hashInsert(get_line_number(), FUNCAO, TK_PR_BOOL, sizeof(int), $3->value->char_sequence);
+            hashInsert(get_line_number(), FUNCAO, TK_PR_BOOL, sizeof(int), $3->literal_token_value_type.value.char_sequence);
 
             // Olhar com calma o que essa func de baixo faz, não lembro exatamente pra o que é mas é importante
             removeReturnType(TK_PR_BOOL);
 
             $$ = create_ast_node( no_type, $3, $7, NULL, NULL, NULL);
+    }
+
+    | opcionalStatic TK_PR_INT TK_IDENTIFICADOR '(' ')' blocoComandos {
+            $$ = create_ast_node( no_type, $3, $6, NULL, NULL, NULL);
+    }
+    | opcionalStatic TK_PR_FLOAT TK_IDENTIFICADOR '(' ')' blocoComandos {
+            $$ = create_ast_node( no_type, $3, $6, NULL, NULL, NULL);
+    }
+    | opcionalStatic TK_PR_CHAR TK_IDENTIFICADOR '(' ')' blocoComandos {
+            $$ = create_ast_node( no_type, $3, $6, NULL, NULL, NULL);
+    }
+    | opcionalStatic TK_PR_BOOL TK_IDENTIFICADOR '(' ')' blocoComandos {
+            $$ = create_ast_node( no_type, $3, $6, NULL, NULL, NULL);
     }
     | opcionalStatic TK_PR_STRING TK_IDENTIFICADOR '(' parametros ')' blocoComandos {
         printf("Erro semantico! Linha %d: Funções não podem retornar tipo string.", get_line_number());
@@ -323,8 +331,13 @@ declaracaoFuncao:
         // Retorno, argumentos e parametros de funcoes nao podem ser do tipo string.
         // Quando estes casos acontecerem, lançar o erro ERR_FUNCTION_STRING.
     }
-    | opcionalStatic tipo TK_IDENTIFICADOR '(' ')' blocoComandos            {
-            $$ = create_ast_node( no_type, $3, $6, NULL, NULL, NULL)  ;}
+    | opcionalStatic TK_PR_STRING TK_IDENTIFICADOR '(' ')' blocoComandos {
+        printf("Erro semantico! Linha %d: Funções não podem retornar tipo string.", get_line_number());
+        exit(ERR_FUNCTION_STRING);
+        // DEF: Etapa 4 - 2.5 - Retorno, argumentos e parâmetros de funções
+        // Retorno, argumentos e parametros de funcoes nao podem ser do tipo string.
+        // Quando estes casos acontecerem, lançar o erro ERR_FUNCTION_STRING.
+    }
     ;
 
 
@@ -423,41 +436,40 @@ listaVar:
 
 atribuicao:
       TK_IDENTIFICADOR '=' expressao {
-        checkUndefinedVariable( $1->value->char_sequence, get_line_number(), VARGLOBAL);
-
-        int expressionType = checkOperands($3);
-        printf("[DEBUG] expressionType: %d", expressionType);
-
-        HASH_NODE *hashNode = hashFind($1->value->char_sequence);
-        char *tipoDefinidoNaVariavel = getTipo(hashNode->type);
-
-        if(getTipo(expressionType) != tipoDefinidoNaVariavel) {
-            if(tipoDefinidoNaVariavel == "char") {
-                printf("\nErro semantico! Linha %d: Variaveis do tipo char não podem ser convertidos!", get_line_number());
-                exit(ERR_CHAR_TO_X);
-                // Definido na 2.4 da Entrega 4
-            }
-            if(tipoDefinidoNaVariavel == "string") {
-                printf("\nErro semantico! Linha %d: Variaveis do tipo string não podem ser convertidos!", get_line_number());
-                exit(ERR_STRING_TO_X);
-                // Definido na 2.4 da Entrega 4
-            }
+        HASH_NODE *hashNode = hashFind($1->literal_token_value_type.value.char_sequence);
+        if ( hashNode == NULL ) {
+            checkUndefinedVariable( $1->literal_token_value_type.value.char_sequence, get_line_number(), VARGLOBAL);
         }
 
-        HASH_NODE *teste = hashFind($1->rawValue);
-
-        if(teste->kind == VECTOR) {
-            printf("\nErro semantico! Linha %d: Vetor (%s) não pode ser utilizada como variavel.", get_line_number(), $1->rawValue);
+        if(hashNode->kind == VECTOR) {
+            printf("\nErro semantico! Linha %d: Vetor (%s) não pode ser utilizada como variavel.", get_line_number(), hashNode->text);
             exit(ERR_VECTOR);
-        }
-
-        if(teste->kind == FUNCAO) {
-            printf("\nErro semantico! Linha %d: Função (%s) não pode ser utilizada como variavel.", get_line_number(), $1->rawValue);
+        } else if(hashNode->kind == FUNCAO) {
+            printf("\nErro semantico! Linha %d: Função (%s) não pode ser utilizada como variavel.", get_line_number(), hashNode->text);
             exit(ERR_FUNCTION);
             // DEF: Etapa 4 - 2.3 - Uso correto de identificadores
         }
 
+        // AQUI EM BAIXO A GENTE VAI VERIFICAR SE O TIPO RESULTADO DA EXPRESSAO
+        // é DO MESMO TIPO DA VARIAVEL PRA QUAL ELE TA ATRIBUINDO:
 
+        // int expressionType = checkOperands($3);
+        // printf("[DEBUG] expressionType: %d", expressionType);
+
+        // char *tipoDefinidoNaVariavel = getTipo(hashNode->type);
+
+        // if(getTipo(expressionType) != tipoDefinidoNaVariavel) {
+        //     if(tipoDefinidoNaVariavel == "char") {
+        //         printf("\nErro semantico! Linha %d: Variaveis do tipo char não podem ser convertidos!", get_line_number());
+        //         exit(ERR_CHAR_TO_X);
+        //         // Definido na 2.4 da Entrega 4
+        //     }
+        //     if(tipoDefinidoNaVariavel == "string") {
+        //         printf("\nErro semantico! Linha %d: Variaveis do tipo string não podem ser convertidos!", get_line_number());
+        //         exit(ERR_STRING_TO_X);
+        //         // Definido na 2.4 da Entrega 4
+        //     }
+        // }
 
         $$ = create_ast_node( var_attribution, $2,
             create_ast_leaf(no_type, $1 ),
@@ -466,7 +478,19 @@ atribuicao:
             NULL);
     }
     | TK_IDENTIFICADOR '[' expressao ']' '=' expressao {
-        // TO DO: checkar que esse identificador é de uma variavel definida como vetor!
+        HASH_NODE *hashNode = hashFind($1->literal_token_value_type.value.char_sequence);
+        if ( hashNode == NULL ) {
+            checkUndefinedVariable( $1->literal_token_value_type.value.char_sequence, get_line_number(), VARGLOBAL);
+        }
+
+        if(hashNode->kind == VARGLOBAL ) {
+            printf("\nErro semantico! Linha %d: Vetor (%s) não pode ser utilizada como vetor.", get_line_number(), hashNode->text);
+            exit(ERR_VECTOR);
+        } else if(hashNode->kind == FUNCAO) {
+            printf("\nErro semantico! Linha %d: Função (%s) não pode ser utilizada como vetor.", get_line_number(), hashNode->text);
+            exit(ERR_FUNCTION);
+            // DEF: Etapa 4 - 2.3 - Uso correto de identificadores
+        }
 
         $$ = create_ast_node( var_attribution, $5,
                 create_ast_node( vec_index, NULL,
@@ -482,7 +506,7 @@ atribuicao:
 
 
 operacoesEntrada: TK_PR_INPUT TK_IDENTIFICADOR {
-        checkInput($2->value->char_sequence, get_line_number());
+        checkInput($2->literal_token_value_type.value.char_sequence, get_line_number());
 
         $$ = create_ast_node(cmd_input, NULL,
                 create_ast_leaf( no_type, $2 ),
@@ -493,7 +517,7 @@ operacoesEntrada: TK_PR_INPUT TK_IDENTIFICADOR {
 operacoesSaida:
       TK_PR_OUTPUT literal          { $$ = create_ast_node(cmd_output, NULL, $2, NULL, NULL, NULL); }
     | TK_PR_OUTPUT TK_IDENTIFICADOR {
-        checkOutput($2->value->char_sequence, get_line_number());
+        checkOutput($2->literal_token_value_type.value.char_sequence, get_line_number());
 
         $$ = create_ast_node(cmd_output, NULL,
                 create_ast_leaf( no_type, $2 ),
@@ -504,7 +528,20 @@ operacoesSaida:
 
 chamadaFuncao:
       TK_IDENTIFICADOR '(' listaEntradas ')' {
-          checkUndefinedVariable($1->value->char_sequence, get_line_number(), FUNCAO);
+        HASH_NODE *hashNode = hashFind($1->literal_token_value_type.value.char_sequence);
+        if ( hashNode == NULL ) {
+            checkUndefinedVariable($1->literal_token_value_type.value.char_sequence, get_line_number(), FUNCAO);
+        }
+
+        if(hashNode->kind == VECTOR) {
+            printf("\nErro semantico! Linha %d: Vetor (%s) não pode ser utilizada como variavel.", get_line_number(), hashNode->text);
+            exit(ERR_VECTOR);
+        } else if(hashNode->kind == FUNCAO) {
+            printf("\nErro semantico! Linha %d: Função (%s) não pode ser utilizada como variavel.", get_line_number(), hashNode->text);
+            exit(ERR_FUNCTION);
+            // DEF: Etapa 4 - 2.3 - Uso correto de identificadores
+        }
+
 
           // Percorrer a arvore de $3 lista de entradas e caso alguma tenha variavel do tipo string, dar:
           // exit(ERR_FUNCTION_STRING);
@@ -534,8 +571,8 @@ identificador: TK_IDENTIFICADOR {
 
 comandoShift:
       identificador TK_OC_SR TK_LIT_INT {
-        // TO DO: verificar se é com o -> mesmo
-        checkShift($3->value->integer, get_line_number());
+        checkShift($3->literal_token_value_type.value.integer, get_line_number());
+
         $$ = create_ast_node(no_type, $2,
             $1,
             create_ast_leaf( no_type, $3 ),
@@ -543,8 +580,8 @@ comandoShift:
             NULL );
     }
     | identificador TK_OC_SL TK_LIT_INT {
-        // TO DO: verificar se é com o -> mesmo
-        checkShift($3->value->integer, get_line_number());
+        checkShift($3->literal_token_value_type.value.integer, get_line_number());
+
         $$ = create_ast_node(no_type, $2,
                 $1,
                 create_ast_leaf( no_type, $3 ),
@@ -552,8 +589,8 @@ comandoShift:
                 NULL );
     }
     | identificador '[' expressao ']' TK_OC_SL TK_LIT_INT {
-        // TO DO: verificar se é com o -> mesmo
-        checkShift($3->value->integer, get_line_number());
+        checkShift($6->literal_token_value_type.value.integer, get_line_number());
+
         $$ = create_ast_node(no_type, $5,
                 create_ast_node( vec_index, NULL,
                     $1,
@@ -565,8 +602,8 @@ comandoShift:
                 NULL );
     }
     | identificador '[' expressao ']' TK_OC_SR TK_LIT_INT {
-        // TO DO: verificar se é com o -> mesmo
-        checkShift($3->value->integer, get_line_number());
+        checkShift($6->literal_token_value_type.value.integer, get_line_number());
+
         $$ = create_ast_node(no_type, $5,
                 create_ast_node( vec_index, NULL,
                     $1,
@@ -717,7 +754,7 @@ char *getTipo(int type) {
 //     int result = 0;
 //     if (node == NULL) return 0;
 
-//     HASH_NODE *tmpNode = hashFind(node->value->char_sequence);
+//     HASH_NODE *tmpNode = hashFind(node->literal_token_value_type.value.char_sequence);
 //     if (tmpNode == NULL) return 0;
 //     if (tmpNode->type == TK_PR_STRING) {
 //         return 1;
