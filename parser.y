@@ -154,13 +154,13 @@ dec:
 
 // Definições que se repetem;
 identificadorOuLiteral:
-      TK_IDENTIFICADOR  { $$ = create_ast_node( no_type, $1, NULL, NULL, NULL, NULL) ;}
-    | TK_LIT_TRUE       { $$ = create_ast_node( no_type, $1, NULL, NULL, NULL, NULL) ;}
-    | TK_LIT_FALSE      { $$ = create_ast_node( no_type, $1, NULL, NULL, NULL, NULL) ;}
-    | TK_LIT_CHAR       { $$ = create_ast_node( no_type, $1, NULL, NULL, NULL, NULL) ;}
-    | TK_LIT_INT        { $$ = create_ast_node( no_type, $1, NULL, NULL, NULL, NULL) ;}
-    | TK_LIT_FLOAT      { $$ = create_ast_node( no_type, $1, NULL, NULL, NULL, NULL) ;}
-    | TK_LIT_STRING     { $$ = create_ast_node( no_type, $1, NULL, NULL, NULL, NULL) ;}
+      TK_IDENTIFICADOR  { $$ = create_ast_leaf( no_type, $1 ) ;}
+    | TK_LIT_TRUE       { $$ = create_ast_leaf( no_type, $1 ) ;}
+    | TK_LIT_FALSE      { $$ = create_ast_leaf( no_type, $1 ) ;}
+    | TK_LIT_CHAR       { $$ = create_ast_leaf( no_type, $1 ) ;}
+    | TK_LIT_INT        { $$ = create_ast_leaf( no_type, $1 ) ;}
+    | TK_LIT_FLOAT      { $$ = create_ast_leaf( no_type, $1 ) ;}
+    | TK_LIT_STRING     { $$ = create_ast_leaf( no_type, $1 ) ;}
     ;
 
 // Não cria nada na AST;
@@ -181,7 +181,7 @@ opcionalConst:
     ;
 
 numero:
-      TK_LIT_INT { $$ = create_ast_node( no_type, $1, NULL, NULL, NULL, NULL) ;};
+      TK_LIT_INT { $$ = create_ast_leaf( no_type, $1 ); };
 
 
 // Declaração de Variavel Global - Não entram na AST - Precisamos liberar o lexeme criado no scanner;
@@ -336,7 +336,7 @@ variavelLocal:
       }
       | TK_IDENTIFICADOR TK_OC_LE identificadorOuLiteral listaVar {
             $$ = create_ast_node( var_initializer, $2,
-                  create_ast_node( no_type, $1, NULL, NULL, NULL, NULL),
+                  create_ast_leaf( no_type, $1 ),
                   $3,
                   $4,
                   NULL
@@ -357,7 +357,7 @@ atribuicao:
         int expressionType = checkOperands($3);
         printf("[DEBUG] expressionType: %d", expressionType);
 
-        HASH_NODE *hashNode = hashFind($1->->value->char_sequence);
+        HASH_NODE *hashNode = hashFind($1->value->char_sequence);
         char *tipoDefinidoNaVariavel = getTipo(hashNode->type);
 
         if(getTipo(expressionType) != tipoDefinidoNaVariavel) {
@@ -389,7 +389,7 @@ atribuicao:
 
 
         $$ = create_ast_node( var_attribution, $2,
-            $$ = create_ast_node(no_type, $1, NULL, NULL, NULL, NULL);,
+            create_ast_leaf(no_type, $1 ),
             $3,
             NULL,
             NULL);
@@ -397,7 +397,7 @@ atribuicao:
     | TK_IDENTIFICADOR '[' expressao ']' '=' expressao {
         $$ = create_ast_node( var_attribution, $5,
                 create_ast_node( vec_index, NULL,
-                      $$ = create_ast_node(no_type, $1, NULL, NULL, NULL, NULL);,
+                      create_ast_leaf( no_type, $1 ),
                       $3,
                       NULL,
                       NULL),
@@ -410,7 +410,7 @@ atribuicao:
 
 operacoesEntrada:
       TK_PR_INPUT TK_IDENTIFICADOR { $$ = create_ast_node(cmd_input, NULL,
-                  create_ast_node( no_type, $2, NULL, NULL, NULL, NULL ),
+                  create_ast_leaf( no_type, $2 ),
                   NULL, NULL, NULL) ;}
       ;
 
@@ -435,7 +435,7 @@ entradaSeguinte:
 
 
 identificador:
-      TK_IDENTIFICADOR { $$ = create_ast_node(no_type, $1, NULL, NULL, NULL, NULL); }
+      TK_IDENTIFICADOR { $$ = create_ast_leaf(no_type, $1 ); }
     ;
 
 
@@ -445,7 +445,7 @@ comandoShift:
         checkShift($3->value->integer, get_line_number());
         $$ = create_ast_node(no_type, $2,
             $1,
-            create_ast_node( no_type, $3, NULL, NULL, NULL, NULL),
+            create_ast_leaf( no_type, $3 ),
             NULL,
             NULL );
     }
@@ -454,7 +454,7 @@ comandoShift:
         checkShift($3->value->integer, get_line_number());
         $$ = create_ast_node(no_type, $2,
                 $1,
-                create_ast_node( no_type, $3, NULL, NULL, NULL, NULL),
+                create_ast_leaf( no_type, $3 ),
                 NULL,
                 NULL );
     }
@@ -464,7 +464,7 @@ comandoShift:
         $$ = create_ast_node(no_type, $5,
                 create_ast_node( vec_index, NULL,
                     $1,
-                    create_ast_node( no_type, $3, NULL, NULL, NULL, NULL),
+                    create_ast_leaf( no_type, $3 ),
                     NULL,
                     NULL),
                 $6,
@@ -477,7 +477,7 @@ comandoShift:
         $$ = create_ast_node(no_type, $5,
                 create_ast_node( vec_index, NULL,
                     $1,
-                    create_ast_node( no_type, $3, NULL, NULL, NULL, NULL),
+                    create_ast_leaf( no_type, $3 ),
                     NULL,
                     NULL),
                 $6,
@@ -502,8 +502,8 @@ operacoesRetorno:
 
         $$ = create_ast_node(cmd_return, NULL, $2, NULL, NULL, NULL);
     }
-    | TK_PR_CONTINUE         { $$ = create_ast_node(cmd_continue, NULL, NULL, NULL, NULL, NULL) ;}
-    | TK_PR_BREAK            { $$ = create_ast_node(cmd_break, NULL, NULL, NULL, NULL, NULL)    ;}
+    | TK_PR_CONTINUE         { $$ = create_ast_leaf(cmd_continue, NULL ) ;}
+    | TK_PR_BREAK            { $$ = create_ast_leaf(cmd_break, NULL )    ;}
     ;
 
 
@@ -524,8 +524,8 @@ expressao:
 aritmeticas:
       identificador
     | identificador '[' expressao ']'     { $$ = create_ast_node( vec_index, NULL, $1, $3, NULL, NULL ) ;}
-    | TK_LIT_INT                          { $$ = create_ast_node( no_type, $1, NULL, NULL, NULL, NULL ) ;}
-    | TK_LIT_FLOAT                        { $$ = create_ast_node( no_type, $1, NULL, NULL, NULL, NULL ) ;}
+    | TK_LIT_INT                          { $$ = create_ast_leaf( no_type, $1 ) ;}
+    | TK_LIT_FLOAT                        { $$ = create_ast_leaf( no_type, $1 ) ;}
     | chamadaFuncao
     ;
 
