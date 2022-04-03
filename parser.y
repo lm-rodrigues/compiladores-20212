@@ -114,6 +114,7 @@
 %type <tree> operacoesSaida
 %type <tree> operacoesRetorno
 %type <tree> declaracaoVariavelGlobal
+%type <tree> literal
 
 // Precedencias:
 %left '<' '>' TK_OC_EQ TK_OC_NE TK_OC_GE TK_OC_LE
@@ -155,7 +156,11 @@ dec:
 // Definições que se repetem;
 identificadorOuLiteral:
       TK_IDENTIFICADOR  { $$ = create_ast_leaf( no_type, $1 ) ;}
-    | TK_LIT_TRUE       { $$ = create_ast_leaf( no_type, $1 ) ;}
+    | literal
+    ;
+
+literal:
+      TK_LIT_TRUE       { $$ = create_ast_leaf( no_type, $1 ) ;}
     | TK_LIT_FALSE      { $$ = create_ast_leaf( no_type, $1 ) ;}
     | TK_LIT_CHAR       { $$ = create_ast_leaf( no_type, $1 ) ;}
     | TK_LIT_INT        { $$ = create_ast_leaf( no_type, $1 ) ;}
@@ -272,21 +277,87 @@ opcionalListVarGlobal:
 
 
 declaracaoFuncao:
-        opcionalStatic tipo TK_IDENTIFICADOR '(' parametros ')' blocoComandos {
-            $$ = create_ast_node( no_type, $3, $7, NULL, NULL, NULL) ;}
-      | opcionalStatic tipo TK_IDENTIFICADOR '(' ')' blocoComandos            {
+      opcionalStatic TK_PR_INT TK_IDENTIFICADOR '(' parametros ')' blocoComandos {
+            checkAlreadyDeclared($3->value->char_sequence, get_line_number(), FUNCAO);
+
+            hashInsert(get_line_number(), FUNCAO, TK_PR_INT, sizeof(int), $3->value->char_sequence);
+
+            // Olhar com calma o que essa func de baixo faz, não lembro exatamente pra o que é mas é importante
+            removeReturnType(TK_PR_INT);
+
+            $$ = create_ast_node( no_type, $3, $7, NULL, NULL, NULL) ;
+    }
+    | opcionalStatic TK_PR_FLOAT TK_IDENTIFICADOR '(' parametros ')' blocoComandos {
+            checkAlreadyDeclared($3->value->char_sequence, get_line_number(), FUNCAO);
+
+            hashInsert(get_line_number(), FUNCAO, TK_PR_FLOAT, sizeof(float), $3->value->char_sequence);
+
+            // Olhar com calma o que essa func de baixo faz, não lembro exatamente pra o que é mas é importante
+            removeReturnType(TK_PR_FLOAT);
+
+            $$ = create_ast_node( no_type, $3, $7, NULL, NULL, NULL) ;
+    }
+    | opcionalStatic TK_PR_CHAR TK_IDENTIFICADOR '(' parametros ')' blocoComandos {
+            checkAlreadyDeclared($3->value->char_sequence, get_line_number(), FUNCAO);
+
+            hashInsert(get_line_number(), FUNCAO, TK_PR_CHAR, sizeof(char), $3->value->char_sequence);
+
+            // Olhar com calma o que essa func de baixo faz, não lembro exatamente pra o que é mas é importante
+            removeReturnType(TK_PR_CHAR);
+            $$ = create_ast_node( no_type, $3, $7, NULL, NULL, NULL) ;
+    }
+    | opcionalStatic TK_PR_BOOL TK_IDENTIFICADOR '(' parametros ')' blocoComandos {
+            checkAlreadyDeclared($3->value->char_sequence, get_line_number(), FUNCAO);
+
+            hashInsert(get_line_number(), FUNCAO, TK_PR_BOOL, sizeof(int), $3->value->char_sequence);
+
+            // Olhar com calma o que essa func de baixo faz, não lembro exatamente pra o que é mas é importante
+            removeReturnType(TK_PR_BOOL);
+
+            $$ = create_ast_node( no_type, $3, $7, NULL, NULL, NULL);
+    }
+    | opcionalStatic TK_PR_STRING TK_IDENTIFICADOR '(' parametros ')' blocoComandos {
+        printf("Erro semantico! Linha %d: Funções não podem retornar tipo string.", get_line_number());
+        exit(ERR_FUNCTION_STRING);
+        // DEF: Etapa 4 - 2.5 - Retorno, argumentos e parâmetros de funções
+        // Retorno, argumentos e parametros de funcoes nao podem ser do tipo string.
+        // Quando estes casos acontecerem, lançar o erro ERR_FUNCTION_STRING.
+    }
+    | opcionalStatic tipo TK_IDENTIFICADOR '(' ')' blocoComandos            {
             $$ = create_ast_node( no_type, $3, $6, NULL, NULL, NULL)  ;}
-      ;
+    ;
 
 
 // Não entram na AST - Precisamos liberar o lexeme criado no scanner;
 parametros:
-        opcionalConst tipo TK_IDENTIFICADOR listaParametros { free_lexeme( $3 ); }
-      ;
+      opcionalConst TK_PR_INT TK_IDENTIFICADOR listaParametros {
+          // Acho que deve ser feito algo aqui mas não sei o que
+
+          free_lexeme( $3 ); }
+    | opcionalConst TK_PR_FLOAT TK_IDENTIFICADOR listaParametros {
+        // Acho que deve ser feito algo aqui mas não sei o que
+
+        free_lexeme( $3 ); }
+    | opcionalConst TK_PR_CHAR TK_IDENTIFICADOR listaParametros {
+        // Acho que deve ser feito algo aqui mas não sei o que
+
+        free_lexeme( $3 ); }
+    | opcionalConst TK_PR_BOOL TK_IDENTIFICADOR listaParametros {
+        // Acho que deve ser feito algo aqui mas não sei o que
+
+        free_lexeme( $3 ); }
+    | opcionalConst TK_PR_STRING TK_IDENTIFICADOR listaParametros {
+        printf("Erro semantico! Linha %d: Funções não podem receber parametros do tipo string.", get_line_number());
+        exit(ERR_FUNCTION_STRING);
+        // DEF: Etapa 4 - 2.5 - Retorno, argumentos e parâmetros de funções
+        // Retorno, argumentos e parametros de funcoes nao podem ser do tipo string.
+        // Quando estes casos acontecerem, lançar o erro ERR_FUNCTION_STRING.
+    }
+    ;
 listaParametros:
-        ',' parametros
-      |
-      ;
+      ',' parametros
+    |
+    ;
 
 
 blocoComandos:
@@ -395,6 +466,8 @@ atribuicao:
             NULL);
     }
     | TK_IDENTIFICADOR '[' expressao ']' '=' expressao {
+        // TO DO: checkar que esse identificador é de uma variavel definida como vetor!
+
         $$ = create_ast_node( var_attribution, $5,
                 create_ast_node( vec_index, NULL,
                       create_ast_leaf( no_type, $1 ),
@@ -408,19 +481,37 @@ atribuicao:
     ;
 
 
-operacoesEntrada:
-      TK_PR_INPUT TK_IDENTIFICADOR { $$ = create_ast_node(cmd_input, NULL,
-                  create_ast_leaf( no_type, $2 ),
-                  NULL, NULL, NULL) ;}
-      ;
+operacoesEntrada: TK_PR_INPUT TK_IDENTIFICADOR {
+        checkInput($2->value->char_sequence, get_line_number());
+
+        $$ = create_ast_node(cmd_input, NULL,
+                create_ast_leaf( no_type, $2 ),
+                NULL, NULL, NULL);
+    }
+    ;
 
 operacoesSaida:
-      TK_PR_OUTPUT identificadorOuLiteral { $$ = create_ast_node(cmd_output, NULL, $2, NULL, NULL, NULL) ;}
-      ;
+      TK_PR_OUTPUT literal          { $$ = create_ast_node(cmd_output, NULL, $2, NULL, NULL, NULL); }
+    | TK_PR_OUTPUT TK_IDENTIFICADOR {
+        checkOutput($2->value->char_sequence, get_line_number());
+
+        $$ = create_ast_node(cmd_output, NULL,
+                create_ast_leaf( no_type, $2 ),
+                NULL, NULL, NULL);
+    }
+    ;
 
 
 chamadaFuncao:
-      TK_IDENTIFICADOR '(' listaEntradas ')' { $$ = create_ast_node(function_call, $1, $3, NULL, NULL, NULL) ;}
+      TK_IDENTIFICADOR '(' listaEntradas ')' {
+          checkUndefinedVariable($1->value->char_sequence, get_line_number(), FUNCAO);
+
+          // Percorrer a arvore de $3 lista de entradas e caso alguma tenha variavel do tipo string, dar:
+          // exit(ERR_FUNCTION_STRING);
+          // DEF: Etapa 4 - 2.5 - Retorno, argumentos e parâmetros de funções
+          // Retorno, argumentos e parametros de funcoes nao podem ser do tipo string.
+
+          $$ = create_ast_node(function_call, $1, $3, NULL, NULL, NULL) ;}
     ;
 
 listaEntradas:
@@ -434,8 +525,10 @@ entradaSeguinte:
     ;
 
 
-identificador:
-      TK_IDENTIFICADOR { $$ = create_ast_leaf(no_type, $1 ); }
+identificador: TK_IDENTIFICADOR {
+        // TO DO: checkUndefinedVariable()
+        $$ = create_ast_leaf(no_type, $1 );
+    }
     ;
 
 
@@ -494,8 +587,10 @@ operacoesRetorno:
         int expressionType = checkOperands(temp);
 
         if ( expressionType == TK_LIT_STRING || expressionType == TK_PR_STRING ) {
+
           exit(ERR_FUNCTION_STRING);
           // DEF: Etapa 4 - 2.5 - Retorno, argumentos e parâmetros de funções
+          // Retorno, argumentos e parametros de funcoes nao podem ser do tipo string.
         }
 
         insertReturnType(expressionType);
