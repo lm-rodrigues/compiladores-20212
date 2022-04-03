@@ -50,8 +50,8 @@ void checkUndefinedVariable(char *variableName, int lineNumber, int variableKind
 // Variaveis somente podem ser usadas sem indexacao, vetores somente podem ser utilizados com indexacao,
 // e func ̧  ̃oes apenas devem ser usadas como chamada de funcao, isto  ́e, seguidas da lista de argumentos,
 // esta possivelmente vazia conforme a sintaxe da E2, entre parˆenteses.
-// Caso o identificador dito variavel seja usado como vetor ou como funcao, deve-se lancr o erro ERR VARIABLE.
-// Caso o identificador dito vetor seja usado como variavel ou funcao, deve-se lancar o erro ERR VECTOR.
+// Caso o identificador dito variavel seja usado como vetor ou como funcao, deve-se lancr o erro ERR_VARIABLE.
+// Caso o identificador dito vetor seja usado como variavel ou funcao, deve-se lancar o erro ERR_VECTOR.
 // Enfim, caso o identificador dito funcao seja utilizado como variavel ou vetor, deve-se lancar o erro ERR_FUNCTION.
 int checkDeclarationAndType();
 
@@ -92,7 +92,9 @@ int checkTypeAndSize(); // não tenho codigo pra isso - é feito direto no parse
 // Caso houver um numero maior de argumentos que o necess ́ario, deve-se lançar o erro ERR EXCESS ARGS.
 // Enfim, quando o numero de argumentos  ́e correto, mas os tipos dos argumentos s ̃ao incompat ́ıveis com
 // os tipos registrados na tabela de s ́ımbolo, deve-se lançar o erro ERR WRONG TYPE ARGS.
-// Retorno, argumentos e parametros de func ̧  ̃oes n ̃ao podem ser do tipo string.
+
+// Feito no parser:
+// Retorno, argumentos e parametros de funcoes nao podem ser do tipo string.
 // Quando estes casos acontecerem, lançar o erro ERR_FUNCTION_STRING.
 int checkArgs();
 
@@ -123,6 +125,6 @@ void checkShift(char *shiftNumber, int lineNumber);
 
 // Mensagens de erro significativas devem ser fornecidas. Elas devem descrever em linguagem natural o erro semantico,
 // as linhas envolvidas, os identificadores e a natureza destes.
-void printSemanticError(int lineNumber, char *identificador, char *natureza, char *maisExplicacoes ) {
+// void printSemanticError(int lineNumber, char *identificador, char *natureza, char *maisExplicacoes ) {
 
 #endif

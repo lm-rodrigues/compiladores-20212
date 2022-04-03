@@ -27,41 +27,53 @@ void checkAlreadyDeclared(char *variableName, int lineNumber, int kind) {
     }
 }
 
-int checkArgs(char *nomeFuncao, int numeroParametros ) {
 
-    int numeroDeclaradoParametros = 0; //TO DOOOOOOOOOOOOOO
+// DEUS ME AJUDE KKKKRYING
+// int checkArgs(char *nomeFuncao, int numeroParametros ) {
 
-    if ( numeroParametros < numeroDeclaradoParametros ) {
-        printSemanticError( "Faltam argumentos para a chamada da função!" );
-        return ERR_MISSING_ARGS;
-    }
-    if ( numeroParametros > numeroDeclaradoParametros ) {
-        printSemanticError( "Muitos argumentos para a chamada da função!" );
-        return ERR_EXCESS_ARGS;
-    }
+//     int numeroDeclaradoParametros = 0; //TO DOOOOOOOOOOOOOO
 
-    // Beleza, tem o mesmo numero de argumentos, agora check dos tipos:
-    int todosOsTiposBatem = 0; // TO DO !!!
-    if ( todosOsTiposBatem ) {
-        printSemanticError( "Os tipos dos parametros não batem!" );
-        return ERR_WRONG_TYPE_ARGS;
-    }
+//     if ( numeroParametros < numeroDeclaradoParametros ) {
+//         printSemanticError( "Faltam argumentos para a chamada da função!" );
+//         return ERR_MISSING_ARGS;
+//     }
+//     if ( numeroParametros > numeroDeclaradoParametros ) {
+//         printSemanticError( "Muitos argumentos para a chamada da função!" );
+//         return ERR_EXCESS_ARGS;
+//     }
 
-    return 0;
-}
+//     // Beleza, tem o mesmo numero de argumentos, agora check dos tipos:
+//     int todosOsTiposBatem = 0; // TO DO !!!
+//     if ( todosOsTiposBatem ) {
+//         printSemanticError( "Os tipos dos parametros não batem!" );
+//         return ERR_WRONG_TYPE_ARGS;
+//     }
+
+//     return 0;
+// }
 
 void checkInput(char *variableName, int lineNumber) {
     HASH_NODE *procurado = hashFind(variableName);
-    if ( procurado->type != TK_PR_INT && procurado->type != TK_PR_FLOAT ) {
-        printf( "\nErro semantico! Linha %d: Variavel ( %s ) deve ser do tipo int ou float, pois está retorna o comando input.", lineNumber, variableName );
-        exit(ERR_WRONG_PAR_INPUT);
+
+    if ( procurado != NULL ) {
+        if ( procurado->type != TK_PR_INT && procurado->type != TK_PR_FLOAT ) {
+            printf( "\nErro semantico! Linha %d: Variavel ( %s ) deve ser do tipo int ou float, pois está retorna o comando input.", lineNumber, variableName );
+            exit(ERR_WRONG_PAR_INPUT);
+        }
+    } else {
+        printf( "Que que eu deveria fazer aqui? a variavel dada pro input não foi encontrada" );
     }
 }
 void checkOutput(char *variableName, int lineNumber) {
-    HASH_NODE *found = hashFind(variableName);
-    if ( found->type != TK_PR_INT && found->type != TK_PR_FLOAT ) {
-        printf( "\nErro semantico! Linha %d: Variavel ( %s ) deve ser do tipo int ou float, pois está retorna o comando output.", lineNumber, variableName );
-        exit(ERR_WRONG_PAR_OUTPUT);
+    HASH_NODE *procurado = hashFind(variableName);
+
+    if ( procurado != NULL ) {
+        if ( procurado->type != TK_PR_INT && procurado->type != TK_PR_FLOAT ) {
+            printf( "\nErro semantico! Linha %d: Variavel ( %s ) deve ser do tipo int ou float, pois está retorna o comando output.", lineNumber, variableName );
+            exit(ERR_WRONG_PAR_OUTPUT);
+        }
+    } else {
+        printf( "Que que eu deveria fazer aqui? a variavel dada pro input não foi encontrada" );
     }
 }
 
@@ -72,9 +84,9 @@ void checkShift(char *shiftNumber, int lineNumber) {
     }
 }
 
-void printSemanticError(int lineNumber, char *identificador, char *natureza, char *maisExplicacoes ) {
-    printf( "\nErro semantico! Linha %d, Identificador %s, Natureza %s: %s.", lineNumber, identificador, natureza, maisExplicacoes );
-}
+// void printSemanticError(int lineNumber, char *identificador, char *natureza, char *maisExplicacoes ) {
+//     printf( "\nErro semantico! Linha %d, Identificador %s, Natureza %s: %s.", lineNumber, identificador, natureza, maisExplicacoes );
+// }
 
 void printSemanticErrorInfo( char *maisExplicacoes ) {
     printf( "\nErro semantico! %s", maisExplicacoes );
@@ -85,58 +97,56 @@ int checkOperands(AST_NODE *node) {
     if(node == NULL) return;
     HASH_NODE *hashNode;
 
-    if( node->label->type != NULL ) {
-        switch (node->label->type) {
-            case (int)'+':
-            case (int)'-':
-            case (int)'*':
-            case (int)'/':
-            case (int)'%':
+    if( node->lexeme->token_category != NULL ) {
+        switch (node->lexeme->token_category) {
+            // case (int)'+':
+            // case (int)'-':
+            // case (int)'*':
+            // case (int)'/':
+            // case (int)'%':
+            case special_char:
                 for(int operand = 0; operand < 2; operand++) {
                     // Operações binárias
                     AST_NODE *son = node->son[operand];
-                    if((son->label->type == (int)'+' ||
-                        son->label->type == (int)'-' ||
-                        son->label->type == (int)'*' ||
-                        son->label->type == (int)'/' ||
-                        son->label->type == (int)'%') ||
+                    if((son->lexeme->token_category == (int)'+' ||
+                        son->lexeme->token_category == (int)'-' ||
+                        son->lexeme->token_category == (int)'*' ||
+                        son->lexeme->token_category == (int)'/' ||
+                        son->lexeme->token_category == (int)'%') ||
                         // Literais
-                        (son->label->type  == TK_LIT_INT  ||
-                        son->label->type  == TK_LIT_FLOAT ||
-                        son->label->type  == TK_LIT_TRUE  ||
-                        son->label->type  == TK_LIT_FALSE)) {
+                        (son->lexeme->token_category  == TK_LIT_INT  ||
+                        son->lexeme->token_category  == TK_LIT_FLOAT ||
+                        son->lexeme->token_category  == TK_LIT_TRUE  ||
+                        son->lexeme->token_category  == TK_LIT_FALSE)) {
                             ;
                         }
-                    else if (son->label->type == TK_IDENTIFICADOR) {
-                        printf( "\n\nIDENTIFICADOR RAW VALUE: %s \n", son->label->rawValue );
-                        HASH_NODE *tmp = hashFind(son->label->rawValue);
+                    else if (son->lexeme->token_category == identifier) {
+                        HASH_NODE *tmp = hashFind(son->lexeme->literal_token_value_type.value.char_sequence);
                         if(tmp != NULL) {
                             if(tmp->type != TK_LIT_INT &&
                                tmp->type != TK_LIT_FLOAT &&
                                tmp->type != TK_LIT_TRUE  &&
                                tmp->type != TK_LIT_FALSE ) {
                                 printf("\nErro semantico: Expressão não pode ser avaliada.");
-                                // DEVERIA TER UM EXIT AQUI??
+                                // SERá QUE DEVERIA TER UM EXIT AQUI??
                             }
                         }
                     }
                 }
                 break;
-            case TK_IDENTIFICADOR:
-                hashNode = hashFind(node->value->char_sequence);
+            case identifier:
+                hashNode = hashFind(node->lexeme->literal_token_value_type.value.char_sequence);
                 if(hashNode != NULL) {
-                    if(hashNode->kind != FUNCAO) {
-                        if(node->value->char_sequence == "[]" && hashNode->kind == VECTOR) {
-                            printf("\nErro semantico! Linha %d: Vetor (%s) não pode ser utilizada como variável.", get_line_number(), node->value->char_sequence);
-                            exit(ERR_VECTOR);
-                        }
-                        return hashNode->type;
-                    }
-                    else {
-                        printf("\nErro semantico! Linha %d: Função (%s) não pode ser utilizada como variável.", get_line_number(), node->value->char_sequence);
+                    if(hashNode->kind == FUNCAO) {
+                        printf("\nErro semantico! Linha %d: Função (%s) não pode ser utilizada como variável.", node->lexeme->line_number, node->lexeme->literal_token_value_type.value.char_sequence);
                         exit(ERR_FUNCTION);
                         // Etapa 4 - 2.3 - Uso correto de identificadores
-                    }
+
+                    } else if(hashNode->kind == VECTOR) {
+                            printf("\nErro semantico! Linha %d: Vetor (%s) não pode ser utilizada como variável.", get_line_number(), node->lexeme->literal_token_value_type.value.char_sequence);
+                            exit(ERR_VECTOR);
+                        }
+                    return hashNode->type;
                 }
                 break;
             case TK_LIT_INT:
