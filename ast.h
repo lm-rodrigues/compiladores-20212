@@ -40,6 +40,7 @@ typedef struct AST_NODE {
 } AST_NODE;
 
 struct AST_NODE *create_ast_node( NodeType type, Lexeme *lexeme, struct AST_NODE *s0, struct AST_NODE *s1, struct AST_NODE *s2, struct AST_NODE *s3);
+struct AST_NODE *create_ast_leaf( NodeType type, Lexeme *lexeme );
 void append_node( struct AST_NODE *s0, struct AST_NODE *s1 );
 
 void exporta(void *tree);

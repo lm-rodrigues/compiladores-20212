@@ -22,6 +22,21 @@ struct AST_NODE *create_ast_node(NodeType type, Lexeme *lexeme, struct AST_NODE 
     return new_node;
 }
 
+struct AST_NODE *create_ast_leaf(NodeType type, Lexeme *lexeme) {
+    AST_NODE *new_node;
+    new_node = malloc(sizeof(AST_NODE));
+
+    new_node->node_type = type;
+    new_node->lexeme = lexeme;
+    new_node->son[0] = NULL;
+    new_node->son[1] = NULL;
+    new_node->son[2] = NULL;
+    new_node->son[3] = NULL;
+    new_node->son[4] = NULL;
+
+    return new_node;
+}
+
 void append_node( struct AST_NODE *s0, struct AST_NODE *s1 ) {
     s0->son[4] = s1;
 }
