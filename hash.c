@@ -31,6 +31,17 @@ HASH_NODE *hashFind(char *text) {
     return NULL;
 }
 
+HASH_NODE *hashFindVariable(char *text, int variableKind) {
+    HASH_NODE *node;
+    int address = hashAddress(text);
+    for(node=Table[address]; node; node = node->next) {
+        if (!strcmp(node->text, text) && node->kind == variableKind ) {
+            return node;
+        }
+    }
+    return NULL;
+}
+
 HASH_NODE *hashInsert(int lineNumber, int kind, int type, int size, char *text) {
     HASH_NODE *new_node;
     if ((new_node = hashFind(text))!=0) return NULL;
